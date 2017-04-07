@@ -1,4 +1,5 @@
 extern crate i2cdev;
+extern crate rand;
 
 use i2cdev::core::I2CDevice;
 use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
@@ -28,18 +29,54 @@ const COLOR_OFFSET: u8 = 0x24;
 
 const ADDRESS: u16 = 0x74;
 
+#[cfg_attr(rustfmt, rustfmt_skip)]
+const a: [&str; 7] = [
+"   ",
+"   ",
+"xxx",
+"  x",
+"xxx",
+"x x",
+"xxx"];
+
+#[cfg_attr(rustfmt, rustfmt_skip)]
+const b: [&str; 7] = [
+"x  ",
+"x  ",
+"x  ",
+"x  ",
+"xxx",
+"x x",
+"xxx"];
+
+#[cfg_attr(rustfmt, rustfmt_skip)]
+const c: [&str; 7] = [
+"   ",
+"   ",
+"   ",
+"   ",
+"xxx",
+"x  ",
+"xxx"];
+
 struct Display {
     device: LinuxI2CDevice,
+    scroll: usize,
+    buffer: [[u8; 17]; 7],
 }
 
 impl Display {
     fn new() -> Display {
         let d = LinuxI2CDevice::new("/dev/i2c-1", ADDRESS).unwrap();
-        Display { device: d }
+        Display {
+            device: d,
+            scroll: 0,
+            buffer: [[0; 17]; 7],
+        }
     }
 
     fn bank(&mut self, bank: u8) {
-        self.device.smbus_write_block_data(BANK_ADDRESS, &[bank]).unwrap();
+        self.device.smbus_write_byte_data(BANK_ADDRESS, bank).unwrap();
     }
 
     fn register(&mut self, bank: u8, register: u8, value: u8) {
@@ -61,29 +98,56 @@ impl Display {
         self.register(CONFIG_BANK, SHUTDOWN_REGISTER, if value { 0 } else { 1 });
     }
 
+    fn set_pixel(&mut self, x: usize, y: usize, value: u8) {
+        self.buffer[y][x] = value;
+    }
+
+    fn show(&mut self) {
+        for y in 0..7 {
+            for x in 0..17 {
+                let offset = if x >= 8 {
+                    (x - 8) * 16 + y
+                } else {
+                    (8 - x) * 16 - (y + 2)
+                };
+                let value = self.buffer[y as usize][x as usize];
+                self.device
+                    .smbus_write_byte_data(COLOR_OFFSET + offset, value)
+                    .unwrap();
+            }
+        }
+    }
+
     fn test(&mut self) {
-        // self.reset();
-        self.bank(CONFIG_BANK);
-        self.device.smbus_write_block_data(MODE_REGISTER, &[PICTURE_MODE]).unwrap();
-        self.device.smbus_write_block_data(AUDIOSYNC_REGISTER, &[0]).unwrap();
-        self.bank(1);
-        self.device.smbus_write_block_data(0, &[255; 17]).unwrap();
-        self.bank(0);
-        self.device.smbus_write_block_data(0, &[255; 17]).unwrap();
-        self.frame(0);
+        self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
+
+        let o = ["xxxxx xxxxx x   x",
+                 "  x       x x   x",
+                 "  x      x  xx  x",
+                 "  x     x   x x x",
+                 "  x    x    x  xx",
+                 "  x   x     x   x",
+                 "  x   xxxxx x   x"];
 
         self.bank(0);
-        // self.device.smbus_write_byte_data(COLOR_OFFSET, 255).unwrap();
-        self.device.smbus_write_block_data(COLOR_OFFSET, &[255]).unwrap();
-        self.device.smbus_write_block_data(COLOR_OFFSET + 32, &[255; 32]).unwrap();
-        self.device.smbus_write_block_data(COLOR_OFFSET + 64, &[255; 32]).unwrap();
-        self.device.smbus_write_block_data(COLOR_OFFSET + 128, &[255; 32]).unwrap();
-        self.frame(0);
+        for y in 0..7 {
+            for x in 0..17 {
+                self.set_pixel(x,
+                               y,
+                               if o[y as usize].chars().nth(x as usize).unwrap() == ' ' {
+                                   0x00
+                               } else {
+                                   0x0F
+                               });
+            }
+        }
+        self.show();
     }
 }
 
 fn main() {
-    println!("Hello, world!");
+    println!("start");
     let mut d = Display::new();
     d.test();
+    println!("end");
 }
