@@ -30,6 +30,8 @@ const COLOR_OFFSET: u8 = 0x24;
 
 const ADDRESS: u16 = 0x74;
 
+const EMPTY_COLUMN: [u8; 7] = [0; 7];
+
 type Glyph = [&'static str; 7];
 
 #[cfg_attr(rustfmt, rustfmt_skip)]
@@ -43,11 +45,6 @@ fn font() -> HashMap<char, Glyph> {
                   "xxxx",
                   "x  x",
                   "x  x"]);
-    //glyphs.insert('A', [
-                  //"xxxxx  ",
-                  //"  x  x ",
-                  //"     x ",
-                  //"xxxxx  "]);
     glyphs.insert('B', [
                   "    " ,
                   "xxx ",
@@ -96,14 +93,166 @@ fn font() -> HashMap<char, Glyph> {
                   "x xx",
                   "x  x",
                   " xxx"]);
+    glyphs.insert('H', [
+                  "    " ,
+                  "x  x",
+                  "x  x",
+                  "xxxx",
+                  "x  x",
+                  "x  x",
+                  "x  x"]);
+    glyphs.insert('I', [
+                  " " ,
+                  "x",
+                  "x",
+                  "x",
+                  "x",
+                  "x",
+                  "x"]);
+    glyphs.insert('J', [
+                  "    " ,
+                  "   x",
+                  "   x",
+                  "   x",
+                  "   x",
+                  "x  x",
+                  " xx "]);
+    glyphs.insert('K', [
+                  "    " ,
+                  "x  x",
+                  "x x ",
+                  "xx  ",
+                  "x x ",
+                  "x  x",
+                  "x  x"]);
+    glyphs.insert('L', [
+                  "   " ,
+                  "x  ",
+                  "x  ",
+                  "x  ",
+                  "x  ",
+                  "x  ",
+                  "xxx"]);
+    glyphs.insert('M', [
+                  "     " ,
+                  "x   x",
+                  "xx xx",
+                  "x x x",
+                  "x   x",
+                  "x   x",
+                  "x   x"]);
+    glyphs.insert('N', [
+                  "    " ,
+                  "x  x",
+                  "xx x",
+                  "x xx",
+                  "x  x",
+                  "x  x",
+                  "x  x"]);
+    glyphs.insert('O', [
+                  "    " ,
+                  " xx ",
+                  "x  x",
+                  "x  x",
+                  "x  x",
+                  "x  x",
+                  " xx "]);
+    glyphs.insert('P', [
+                  "    " ,
+                  "xxx ",
+                  "x  x",
+                  "xxx ",
+                  "x   ",
+                  "x   ",
+                  "x   "]);
+    glyphs.insert('Q', [
+                  "     " ,
+                  " xx  ",
+                  "x  x ",
+                  "x  x ",
+                  "x  x ",
+                  "x xx ",
+                  " xx x"]);
+    glyphs.insert('R', [
+                  "     " ,
+                  "xxx  ",
+                  "x  x ",
+                  "xxx  ",
+                  "x  x ",
+                  "x  x ",
+                  "x  x "]);
+    glyphs.insert('S', [
+                  "    " ,
+                  " xxx",
+                  "x   ",
+                  " xx ",
+                  "   x",
+                  "   x",
+                  "xxx "]);
+    glyphs.insert('T', [
+                  "     " ,
+                  "xxxxx",
+                  "  x  ",
+                  "  x  ",
+                  "  x  ",
+                  "  x  ",
+                  "  x  "]);
+    glyphs.insert('U', [
+                  "    " ,
+                  "x  x",
+                  "x  x",
+                  "x  x",
+                  "x  x",
+                  "x  x",
+                  " xx "]);
+    glyphs.insert('V', [
+                  "     " ,
+                  "x   x",
+                  "x   x",
+                  "x   x",
+                  "x   x",
+                  " x x ",
+                  "  x  "]);
+    glyphs.insert('W', [
+                  "     " ,
+                  "x   x",
+                  "x   x",
+                  "x   x",
+                  "x x x",
+                  "x x x",
+                  " x x "]);
+    glyphs.insert('X', [
+                  "     " ,
+                  "x   x",
+                  " x x ",
+                  "  x  ",
+                  " x x ",
+                  "x   x",
+                  "x   x"]);
+    glyphs.insert('Y', [
+                  "     " ,
+                  "x   x",
+                  " x x ",
+                  "  x  ",
+                  "  x  ",
+                  "  x  ",
+                  "  x  "]);
+    glyphs.insert('Z', [
+                  "    " ,
+                  "xxxx",
+                  "   x",
+                  "  x ",
+                  " x  ",
+                  "x   ",
+                  "xxxx"]);
     glyphs
 }
 
 struct Display {
     device: LinuxI2CDevice,
     scroll: usize,
-    buffer: [[u8; 17]; 7],
-    buffer1: Vec<[u8; 7]>,
+    buffer: Vec<[u8; 7]>,
+    frame: u8,
 }
 
 impl Display {
@@ -112,8 +261,8 @@ impl Display {
         Display {
             device: d,
             scroll: 0,
-            buffer: [[0; 17]; 7],
-            buffer1: vec![],
+            buffer: vec![EMPTY_COLUMN],
+            frame: 0,
         }
     }
 
@@ -123,6 +272,9 @@ impl Display {
 
     fn scroll(&mut self) {
         self.scroll += 1;
+        if self.scroll >= self.buffer.len() {
+            self.scroll = 0;
+        }
     }
 
     fn register(&mut self, bank: u8, register: u8, value: u8) {
@@ -145,28 +297,40 @@ impl Display {
     }
 
     fn set_pixel(&mut self, x: usize, y: usize, value: u8) {
-        self.buffer[y][x] = value;
+        if y >= 7 {
+            return;
+        }
+        if x >= self.buffer.len() {
+            for _ in self.buffer.len()..(x + 1) {
+                self.buffer.push(EMPTY_COLUMN);
+            }
+        }
+        self.buffer[x][y] = value;
     }
 
     fn set_text(&mut self, text: &str) {
         let font = font();
         let mut offset = 0;
         for c in text.chars() {
-            let glyph = font[&c];
-            // self.buffer1.extend(glyph);
-            for y in 0..glyph.len() {
-                let row = glyph[y];
-                for x in 0..row.len() {
-                    let pixel = row.chars().nth(x).unwrap();
-                    self.set_pixel(x + offset, y, if pixel == ' ' { 0x00 } else { 0x0F });
+            if let Some(glyph) = font.get(&c) {
+                for y in 0..glyph.len() {
+                    let row = glyph[y];
+                    for x in 0..row.len() {
+                        let pixel = row.chars().nth(x).unwrap();
+                        self.set_pixel(x + offset, y, if pixel == ' ' { 0x00 } else { 0x0F });
+                    }
                 }
+                // We assume that all the rows have equal length.
+                offset += glyph[0].len() + 1;
             }
-            // We assume that all the rows have equal length.
-            offset += glyph[0].len() + 1;
         }
     }
 
     fn show(&mut self) {
+        // TODO(tzn): Double buffering.
+        // let new_frame = (self.frame + 1) % 2;
+        let new_frame = 1;
+        self.bank(new_frame);
         for y in 0..7 {
             for x in 0..17 {
                 let offset = if x >= 8 {
@@ -174,24 +338,28 @@ impl Display {
                 } else {
                     (8 - x) * 16 - (y + 2)
                 };
-                let value = self.buffer[y as usize][self.scroll + x as usize];
+                let value = match self.buffer.get(self.scroll + x as usize) {
+                    Some(column) => column[y as usize],
+                    None => 0,
+                };
                 self.device
                     .smbus_write_byte_data(COLOR_OFFSET + offset, value)
                     .unwrap();
             }
         }
+        self.frame(new_frame);
+        self.frame = new_frame;
     }
 
     fn test(&mut self) {
         self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
-        self.bank(0);
-        self.set_text("ABC");
+        self.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
-        self.show();
-        // for _ in 0..10 {
-        // std::thread::sleep(std::time::Duration::from_millis(100));
-        // self.scroll();
-        // }
+        for _ in 0..3000 {
+            self.show();
+            std::thread::sleep(std::time::Duration::from_millis(100));
+            self.scroll();
+        }
     }
 }
 

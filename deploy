@@ -8,4 +8,4 @@ readonly TARGET='pi@100.120.84.98'
 #scp target/arm-unknown-linux-gnueabihf/debug/scroll-phat-hd-rs pi@100.120.84.98:/home/pi/
 cargo build
 scp target/arm-unknown-linux-gnueabi/debug/scroll-phat-hd-rs ${TARGET}:/home/pi/
-ssh ${TARGET} /home/pi/scroll-phat-hd-rs
+ssh ${TARGET} RUST_BACKTRACE=1 /home/pi/scroll-phat-hd-rs
