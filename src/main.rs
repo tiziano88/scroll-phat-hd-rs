@@ -1,6 +1,7 @@
 extern crate i2cdev;
 extern crate rand;
 
+use std::collections::HashMap;
 use i2cdev::core::I2CDevice;
 use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 
@@ -29,40 +30,80 @@ const COLOR_OFFSET: u8 = 0x24;
 
 const ADDRESS: u16 = 0x74;
 
-#[cfg_attr(rustfmt, rustfmt_skip)]
-const a: [&str; 7] = [
-"   ",
-"   ",
-"xxx",
-"  x",
-"xxx",
-"x x",
-"xxx"];
+type Glyph = [&'static str; 7];
 
 #[cfg_attr(rustfmt, rustfmt_skip)]
-const b: [&str; 7] = [
-"x  ",
-"x  ",
-"x  ",
-"x  ",
-"xxx",
-"x x",
-"xxx"];
-
-#[cfg_attr(rustfmt, rustfmt_skip)]
-const c: [&str; 7] = [
-"   ",
-"   ",
-"   ",
-"   ",
-"xxx",
-"x  ",
-"xxx"];
+fn font() -> HashMap<char, Glyph> {
+    let mut glyphs = HashMap::new();
+    glyphs.insert('A', [
+                  "    " ,
+                  " xx ",
+                  "x  x",
+                  "x  x",
+                  "xxxx",
+                  "x  x",
+                  "x  x"]);
+    //glyphs.insert('A', [
+                  //"xxxxx  ",
+                  //"  x  x ",
+                  //"     x ",
+                  //"xxxxx  "]);
+    glyphs.insert('B', [
+                  "    " ,
+                  "xxx ",
+                  "x  x",
+                  "xxx ",
+                  "x  x",
+                  "x  x",
+                  "xxx "]);
+    glyphs.insert('C', [
+                  "    " ,
+                  " xxx",
+                  "x   ",
+                  "x   ",
+                  "x   ",
+                  "x   ",
+                  " xxx"]);
+    glyphs.insert('D', [
+                  "    " ,
+                  "xxx ",
+                  "x  x",
+                  "x  x",
+                  "x  x",
+                  "x  x",
+                  "xxx "]);
+    glyphs.insert('E', [
+                  "    " ,
+                  "xxxx",
+                  "x   ",
+                  "xxx ",
+                  "x   ",
+                  "x   ",
+                  "xxxx"]);
+    glyphs.insert('F', [
+                  "    " ,
+                  "xxxx",
+                  "x   ",
+                  "xxx ",
+                  "x   ",
+                  "x   ",
+                  "x   "]);
+    glyphs.insert('G', [
+                  "    " ,
+                  " xxx",
+                  "x   ",
+                  "x   ",
+                  "x xx",
+                  "x  x",
+                  " xxx"]);
+    glyphs
+}
 
 struct Display {
     device: LinuxI2CDevice,
     scroll: usize,
     buffer: [[u8; 17]; 7],
+    buffer1: Vec<[u8; 7]>,
 }
 
 impl Display {
@@ -72,11 +113,16 @@ impl Display {
             device: d,
             scroll: 0,
             buffer: [[0; 17]; 7],
+            buffer1: vec![],
         }
     }
 
     fn bank(&mut self, bank: u8) {
         self.device.smbus_write_byte_data(BANK_ADDRESS, bank).unwrap();
+    }
+
+    fn scroll(&mut self) {
+        self.scroll += 1;
     }
 
     fn register(&mut self, bank: u8, register: u8, value: u8) {
@@ -102,6 +148,24 @@ impl Display {
         self.buffer[y][x] = value;
     }
 
+    fn set_text(&mut self, text: &str) {
+        let font = font();
+        let mut offset = 0;
+        for c in text.chars() {
+            let glyph = font[&c];
+            // self.buffer1.extend(glyph);
+            for y in 0..glyph.len() {
+                let row = glyph[y];
+                for x in 0..row.len() {
+                    let pixel = row.chars().nth(x).unwrap();
+                    self.set_pixel(x + offset, y, if pixel == ' ' { 0x00 } else { 0x0F });
+                }
+            }
+            // We assume that all the rows have equal length.
+            offset += glyph[0].len() + 1;
+        }
+    }
+
     fn show(&mut self) {
         for y in 0..7 {
             for x in 0..17 {
@@ -110,7 +174,7 @@ impl Display {
                 } else {
                     (8 - x) * 16 - (y + 2)
                 };
-                let value = self.buffer[y as usize][x as usize];
+                let value = self.buffer[y as usize][self.scroll + x as usize];
                 self.device
                     .smbus_write_byte_data(COLOR_OFFSET + offset, value)
                     .unwrap();
@@ -120,32 +184,19 @@ impl Display {
 
     fn test(&mut self) {
         self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
-
-        let o = ["xxxxx xxxxx x   x",
-                 "  x       x x   x",
-                 "  x      x  xx  x",
-                 "  x     x   x x x",
-                 "  x    x    x  xx",
-                 "  x   x     x   x",
-                 "  x   xxxxx x   x"];
-
         self.bank(0);
-        for y in 0..7 {
-            for x in 0..17 {
-                self.set_pixel(x,
-                               y,
-                               if o[y as usize].chars().nth(x as usize).unwrap() == ' ' {
-                                   0x00
-                               } else {
-                                   0x0F
-                               });
-            }
-        }
+        self.set_text("ABC");
+
         self.show();
+        // for _ in 0..10 {
+        // std::thread::sleep(std::time::Duration::from_millis(100));
+        // self.scroll();
+        // }
     }
 }
 
 fn main() {
+    font();
     println!("start");
     let mut d = Display::new();
     d.test();
