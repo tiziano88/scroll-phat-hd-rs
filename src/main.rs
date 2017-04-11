@@ -253,6 +253,7 @@ struct Display {
     scroll: usize,
     buffer: Vec<[u8; 7]>,
     frame: u8,
+    brightness: u8,
 }
 
 impl Display {
@@ -263,6 +264,7 @@ impl Display {
             scroll: 0,
             buffer: vec![EMPTY_COLUMN],
             frame: 0,
+            brightness: 0x0F,
         }
     }
 
@@ -310,6 +312,7 @@ impl Display {
 
     fn set_text(&mut self, text: &str) {
         let font = font();
+        let brightness = self.brightness;
         let mut offset = 0;
         for c in text.chars() {
             if let Some(glyph) = font.get(&c) {
@@ -317,7 +320,7 @@ impl Display {
                     let row = glyph[y];
                     for x in 0..row.len() {
                         let pixel = row.chars().nth(x).unwrap();
-                        self.set_pixel(x + offset, y, if pixel == ' ' { 0x00 } else { 0x0F });
+                        self.set_pixel(x + offset, y, if pixel == ' ' { 0x00 } else { brightness });
                     }
                 }
                 // We assume that all the rows have equal length.
@@ -342,9 +345,10 @@ impl Display {
                     Some(column) => column[y as usize],
                     None => 0,
                 };
-                self.device
-                    .smbus_write_byte_data(COLOR_OFFSET + offset, value)
-                    .unwrap();
+                match self.device.smbus_write_byte_data(COLOR_OFFSET + offset, value) {
+                    Ok(_) => {}
+                    Err(err) => println!("error writing to i2c device: {}", err),
+                };
             }
         }
         self.frame(new_frame);
