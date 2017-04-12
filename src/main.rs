@@ -37,6 +37,86 @@ type Glyph = [&'static str; 7];
 #[cfg_attr(rustfmt, rustfmt_skip)]
 fn font() -> HashMap<char, Glyph> {
     let mut glyphs = HashMap::new();
+    glyphs.insert('0', [
+                  "    " ,
+                  " xx ",
+                  "x  x",
+                  "x xx",
+                  "xx x",
+                  "x  x",
+                  " xx "]);
+    glyphs.insert('1', [
+                  "   " ,
+                  " x ",
+                  "xx ",
+                  " x ",
+                  " x ",
+                  " x ",
+                  "xxx"]);
+    glyphs.insert('2', [
+                  "    " ,
+                  "xxx ",
+                  "   x",
+                  "  x ",
+                  " x  ",
+                  "x   ",
+                  "xxxx"]);
+    glyphs.insert('3', [
+                  "    " ,
+                  "xxx ",
+                  "   x",
+                  " xx ",
+                  "   x",
+                  "   x",
+                  "xxx "]);
+    glyphs.insert('4', [
+                  "    " ,
+                  "   x",
+                  "  x ",
+                  " x  ",
+                  "x  x",
+                  "xxxx",
+                  "   x"]);
+    glyphs.insert('5', [
+                  "    " ,
+                  "xxxx",
+                  "x   ",
+                  "xxx ",
+                  "   x",
+                  "   x",
+                  "xxx "]);
+    glyphs.insert('6', [
+                  "    " ,
+                  " xxx",
+                  "x   ",
+                  "xxx ",
+                  "x  x",
+                  "x  x",
+                  " xx "]);
+    glyphs.insert('7', [
+                  "    " ,
+                  "xxxx",
+                  "   x",
+                  "  x ",
+                  " x  ",
+                  "x   ",
+                  "x   "]);
+    glyphs.insert('8', [
+                  "    " ,
+                  " xx ",
+                  "x  x",
+                  " xx ",
+                  "x  x",
+                  "x  x",
+                  " xx "]);
+    glyphs.insert('9', [
+                  "    " ,
+                  " xx ",
+                  "x  x",
+                  " xxx",
+                  "   x",
+                  "   x",
+                  " xx "]);
     glyphs.insert('A', [
                   "    " ,
                   " xx ",
@@ -357,7 +437,7 @@ impl Display {
 
     fn test(&mut self) {
         self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
-        self.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        self.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 
         for _ in 0..3000 {
             self.show();
