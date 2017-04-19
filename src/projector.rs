@@ -1,4 +1,5 @@
 extern crate i2cdev;
+extern crate termion;
 
 use self::i2cdev::core::I2CDevice;
 use self::i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
@@ -113,14 +114,14 @@ impl TermProjector {
 
 impl Projector for TermProjector {
     fn project(&mut self, buffer: &[Column]) {
-        print!("-------\n");
-        for col in buffer {
-            for c in col {
-                let v = if *c == 0 { ' ' } else { '#' };
-                print!("{}", v);
+        print!("{}", termion::clear::All);
+        for x in 0..buffer.len() {
+            let col = &buffer[x];
+            for y in 0..col.len() {
+                let c = col[y];
+                let v = if c == 0 { ' ' } else { '#' };
+                println!("{}{}", termion::cursor::Goto(x as u16 + 1, y as u16 + 1), v);
             }
-            print!("\n");
         }
-        print!("-------\n");
     }
 }
