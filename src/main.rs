@@ -30,308 +30,325 @@ const COLOR_OFFSET: u8 = 0x24;
 
 const ADDRESS: u16 = 0x74;
 
-const EMPTY_COLUMN: [u8; 7] = [0; 7];
+type Column = [u8; 7];
+type Glyph = Vec<&'static Column>;
 
-type Glyph = [&'static str; 7];
+const EMPTY_COLUMN: Column = [0; 7];
+
+fn make_glyph(v: [&'static str; 7]) -> Glyph {
+    let width = v[0].len();
+    let mut glyph = vec![];
+    for _ in 0..width {
+        glyph.push(EMPTY_COLUMN);
+    }
+    for y in 0..v.len() {
+        let row = v[y];
+        for x in 0..row.len() {
+            let c = row.chars().nth(x).unwrap();
+            glyph[x][y] = if c == ' ' { 0x00 } else { 0x0F };
+        }
+    }
+    glyph
+}
 
 #[cfg_attr(rustfmt, rustfmt_skip)]
 fn font() -> HashMap<char, Glyph> {
     let mut glyphs = HashMap::new();
-    glyphs.insert('0', [
+    glyphs.insert('0', make_glyph([
                   "    " ,
                   " xx ",
                   "x  x",
                   "x xx",
                   "xx x",
                   "x  x",
-                  " xx "]);
-    glyphs.insert('1', [
+                  " xx "]));
+    glyphs.insert('1', make_glyph([
                   "   " ,
                   " x ",
                   "xx ",
                   " x ",
                   " x ",
                   " x ",
-                  "xxx"]);
-    glyphs.insert('2', [
+                  "xxx"]));
+    glyphs.insert('2', make_glyph([
                   "    " ,
                   "xxx ",
                   "   x",
                   "  x ",
                   " x  ",
                   "x   ",
-                  "xxxx"]);
-    glyphs.insert('3', [
+                  "xxxx"]));
+    glyphs.insert('3', make_glyph([
                   "    " ,
                   "xxx ",
                   "   x",
                   " xx ",
                   "   x",
                   "   x",
-                  "xxx "]);
-    glyphs.insert('4', [
+                  "xxx "]));
+    glyphs.insert('4', make_glyph([
                   "    " ,
                   "   x",
                   "  x ",
                   " x  ",
                   "x  x",
                   "xxxx",
-                  "   x"]);
-    glyphs.insert('5', [
+                  "   x"]));
+    glyphs.insert('5', make_glyph([
                   "    " ,
                   "xxxx",
                   "x   ",
                   "xxx ",
                   "   x",
                   "   x",
-                  "xxx "]);
-    glyphs.insert('6', [
+                  "xxx "]));
+    glyphs.insert('6', make_glyph([
                   "    " ,
                   " xxx",
                   "x   ",
                   "xxx ",
                   "x  x",
                   "x  x",
-                  " xx "]);
-    glyphs.insert('7', [
+                  " xx "]));
+    glyphs.insert('7', make_glyph([
                   "    " ,
                   "xxxx",
                   "   x",
                   "  x ",
                   " x  ",
                   "x   ",
-                  "x   "]);
-    glyphs.insert('8', [
+                  "x   "]));
+    glyphs.insert('8', make_glyph([
                   "    " ,
                   " xx ",
                   "x  x",
                   " xx ",
                   "x  x",
                   "x  x",
-                  " xx "]);
-    glyphs.insert('9', [
+                  " xx "]));
+    glyphs.insert('9', make_glyph([
                   "    " ,
                   " xx ",
                   "x  x",
                   " xxx",
                   "   x",
                   "   x",
-                  " xx "]);
-    glyphs.insert('A', [
+                  " xx "]));
+    glyphs.insert('A', make_glyph([
                   "    " ,
                   " xx ",
                   "x  x",
                   "x  x",
                   "xxxx",
                   "x  x",
-                  "x  x"]);
-    glyphs.insert('B', [
+                  "x  x"]));
+    glyphs.insert('B', make_glyph([
                   "    " ,
                   "xxx ",
                   "x  x",
                   "xxx ",
                   "x  x",
                   "x  x",
-                  "xxx "]);
-    glyphs.insert('C', [
+                  "xxx "]));
+    glyphs.insert('C', make_glyph([
                   "    " ,
                   " xxx",
                   "x   ",
                   "x   ",
                   "x   ",
                   "x   ",
-                  " xxx"]);
-    glyphs.insert('D', [
+                  " xxx"]));
+    glyphs.insert('D', make_glyph([
                   "    " ,
                   "xxx ",
                   "x  x",
                   "x  x",
                   "x  x",
                   "x  x",
-                  "xxx "]);
-    glyphs.insert('E', [
-                  "    " ,
-                  "xxxx",
-                  "x   ",
-                  "xxx ",
-                  "x   ",
-                  "x   ",
-                  "xxxx"]);
-    glyphs.insert('F', [
+                  "xxx "]));
+    glyphs.insert('E', make_glyph([
                   "    " ,
                   "xxxx",
                   "x   ",
                   "xxx ",
                   "x   ",
                   "x   ",
-                  "x   "]);
-    glyphs.insert('G', [
+                  "xxxx"]));
+    glyphs.insert('F', make_glyph([
+                  "    " ,
+                  "xxxx",
+                  "x   ",
+                  "xxx ",
+                  "x   ",
+                  "x   ",
+                  "x   "]));
+    glyphs.insert('G', make_glyph([
                   "    " ,
                   " xxx",
                   "x   ",
                   "x   ",
                   "x xx",
                   "x  x",
-                  " xxx"]);
-    glyphs.insert('H', [
+                  " xxx"]));
+    glyphs.insert('H', make_glyph([
                   "    " ,
                   "x  x",
                   "x  x",
                   "xxxx",
                   "x  x",
                   "x  x",
-                  "x  x"]);
-    glyphs.insert('I', [
+                  "x  x"]));
+    glyphs.insert('I', make_glyph([
                   " " ,
                   "x",
                   "x",
                   "x",
                   "x",
                   "x",
-                  "x"]);
-    glyphs.insert('J', [
+                  "x"]));
+    glyphs.insert('J', make_glyph([
                   "    " ,
                   "   x",
                   "   x",
                   "   x",
                   "   x",
                   "x  x",
-                  " xx "]);
-    glyphs.insert('K', [
+                  " xx "]));
+    glyphs.insert('K', make_glyph([
                   "    " ,
                   "x  x",
                   "x x ",
                   "xx  ",
                   "x x ",
                   "x  x",
-                  "x  x"]);
-    glyphs.insert('L', [
+                  "x  x"]));
+    glyphs.insert('L', make_glyph([
                   "   " ,
                   "x  ",
                   "x  ",
                   "x  ",
                   "x  ",
                   "x  ",
-                  "xxx"]);
-    glyphs.insert('M', [
+                  "xxx"]));
+    glyphs.insert('M', make_glyph([
                   "     " ,
                   "x   x",
                   "xx xx",
                   "x x x",
                   "x   x",
                   "x   x",
-                  "x   x"]);
-    glyphs.insert('N', [
+                  "x   x"]));
+    glyphs.insert('N', make_glyph([
                   "    " ,
                   "x  x",
                   "xx x",
                   "x xx",
                   "x  x",
                   "x  x",
-                  "x  x"]);
-    glyphs.insert('O', [
+                  "x  x"]));
+    glyphs.insert('O', make_glyph([
                   "    " ,
                   " xx ",
                   "x  x",
                   "x  x",
                   "x  x",
                   "x  x",
-                  " xx "]);
-    glyphs.insert('P', [
+                  " xx "]));
+    glyphs.insert('P', make_glyph([
                   "    " ,
                   "xxx ",
                   "x  x",
                   "xxx ",
                   "x   ",
                   "x   ",
-                  "x   "]);
-    glyphs.insert('Q', [
+                  "x   "]));
+    glyphs.insert('Q', make_glyph([
                   "     " ,
                   " xx  ",
                   "x  x ",
                   "x  x ",
                   "x  x ",
                   "x xx ",
-                  " xx x"]);
-    glyphs.insert('R', [
+                  " xx x"]));
+    glyphs.insert('R', make_glyph([
                   "     " ,
                   "xxx  ",
                   "x  x ",
                   "xxx  ",
                   "x  x ",
                   "x  x ",
-                  "x  x "]);
-    glyphs.insert('S', [
+                  "x  x "]));
+    glyphs.insert('S', make_glyph([
                   "    " ,
                   " xxx",
                   "x   ",
                   " xx ",
                   "   x",
                   "   x",
-                  "xxx "]);
-    glyphs.insert('T', [
+                  "xxx "]));
+    glyphs.insert('T', make_glyph([
                   "     " ,
                   "xxxxx",
                   "  x  ",
                   "  x  ",
                   "  x  ",
                   "  x  ",
-                  "  x  "]);
-    glyphs.insert('U', [
+                  "  x  "]));
+    glyphs.insert('U', make_glyph([
                   "    " ,
                   "x  x",
                   "x  x",
                   "x  x",
                   "x  x",
                   "x  x",
-                  " xx "]);
-    glyphs.insert('V', [
+                  " xx "]));
+    glyphs.insert('V', make_glyph([
                   "     " ,
                   "x   x",
                   "x   x",
                   "x   x",
                   "x   x",
                   " x x ",
-                  "  x  "]);
-    glyphs.insert('W', [
+                  "  x  "]));
+    glyphs.insert('W', make_glyph([
                   "     " ,
                   "x   x",
                   "x   x",
                   "x   x",
                   "x x x",
                   "x x x",
-                  " x x "]);
-    glyphs.insert('X', [
+                  " x x "]));
+    glyphs.insert('X', make_glyph([
                   "     " ,
                   "x   x",
                   " x x ",
                   "  x  ",
                   " x x ",
                   "x   x",
-                  "x   x"]);
-    glyphs.insert('Y', [
+                  "x   x"]));
+    glyphs.insert('Y', make_glyph([
                   "     " ,
                   "x   x",
                   " x x ",
                   "  x  ",
                   "  x  ",
                   "  x  ",
-                  "  x  "]);
-    glyphs.insert('Z', [
+                  "  x  "]));
+    glyphs.insert('Z', make_glyph([
                   "    " ,
                   "xxxx",
                   "   x",
                   "  x ",
                   " x  ",
                   "x   ",
-                  "xxxx"]);
+                  "xxxx"]));
     glyphs
 }
 
 struct Display {
     device: LinuxI2CDevice,
     scroll: usize,
-    buffer: Vec<[u8; 7]>,
+    buffer: Vec<&'static Column>,
     frame: u8,
     brightness: u8,
 }
@@ -396,15 +413,8 @@ impl Display {
         let mut offset = 0;
         for c in text.chars() {
             if let Some(glyph) = font.get(&c) {
-                for y in 0..glyph.len() {
-                    let row = glyph[y];
-                    for x in 0..row.len() {
-                        let pixel = row.chars().nth(x).unwrap();
-                        self.set_pixel(x + offset, y, if pixel == ' ' { 0x00 } else { brightness });
-                    }
-                }
-                // We assume that all the rows have equal length.
-                offset += glyph[0].len() + 1;
+                self.buffer.append(glyph);
+                self.buffer.push(EMPTY_COLUMN);
             }
         }
     }
