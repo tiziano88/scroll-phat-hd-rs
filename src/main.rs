@@ -31,8 +31,7 @@ const COLOR_OFFSET: u8 = 0x24;
 const ADDRESS: u16 = 0x74;
 
 type Column = [u8; 7];
-type Glyph = Vec<&'static Column>;
-
+type Glyph = Vec<Column>;
 const EMPTY_COLUMN: Column = [0; 7];
 
 fn make_glyph(v: [&'static str; 7]) -> Glyph {
@@ -345,21 +344,28 @@ fn font() -> HashMap<char, Glyph> {
     glyphs
 }
 
-struct Display {
-    device: LinuxI2CDevice,
+struct Display<'a> {
     scroll: usize,
-    buffer: Vec<&'static Column>,
+    buffer: Vec<Column>,
+    projector: &'a mut Projector,
+}
+
+trait Projector {
+    fn project(&mut self, &[Column]);
+}
+
+struct I2CProjector {
+    device: LinuxI2CDevice,
     frame: u8,
     brightness: u8,
 }
 
-impl Display {
-    fn new() -> Display {
+impl I2CProjector {
+    fn new() -> I2CProjector {
         let d = LinuxI2CDevice::new("/dev/i2c-1", ADDRESS).unwrap();
-        Display {
+        // self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
+        I2CProjector {
             device: d,
-            scroll: 0,
-            buffer: vec![EMPTY_COLUMN],
             frame: 0,
             brightness: 0x0F,
         }
@@ -367,13 +373,6 @@ impl Display {
 
     fn bank(&mut self, bank: u8) {
         self.device.smbus_write_byte_data(BANK_ADDRESS, bank).unwrap();
-    }
-
-    fn scroll(&mut self) {
-        self.scroll += 1;
-        if self.scroll >= self.buffer.len() {
-            self.scroll = 0;
-        }
     }
 
     fn register(&mut self, bank: u8, register: u8, value: u8) {
@@ -394,6 +393,50 @@ impl Display {
     fn sleep(&mut self, value: bool) {
         self.register(CONFIG_BANK, SHUTDOWN_REGISTER, if value { 0 } else { 1 });
     }
+}
+
+impl Projector for I2CProjector {
+    fn project(&mut self, buffer: &[Column]) {
+        // TODO(tzn): Double buffering.
+        // let new_frame = (self.frame + 1) % 2;
+        let new_frame = 1;
+        self.bank(new_frame);
+        for y in 0..7 {
+            for x in 0..17 {
+                let offset = if x >= 8 {
+                    (x - 8) * 16 + y
+                } else {
+                    (8 - x) * 16 - (y + 2)
+                };
+                let value = match buffer.get(x as usize) {
+                    Some(column) => column[y as usize],
+                    None => 0,
+                };
+                self.device
+                    .smbus_write_byte_data(COLOR_OFFSET + offset, value)
+                    .unwrap();
+            }
+        }
+        self.frame(new_frame);
+        self.frame = new_frame;
+    }
+}
+
+impl<'a> Display<'a> {
+    fn new(projector: &'a mut Projector) -> Display {
+        Display {
+            scroll: 0,
+            buffer: vec![],
+            projector: projector,
+        }
+    }
+
+    fn scroll(&mut self) {
+        self.scroll += 1;
+        if self.scroll >= self.buffer.len() {
+            self.scroll = 0;
+        }
+    }
 
     fn set_pixel(&mut self, x: usize, y: usize, value: u8) {
         if y >= 7 {
@@ -409,58 +452,33 @@ impl Display {
 
     fn set_text(&mut self, text: &str) {
         let font = font();
-        let brightness = self.brightness;
+        let brightness = 0x0F;
         let mut offset = 0;
         for c in text.chars() {
             if let Some(glyph) = font.get(&c) {
-                self.buffer.append(glyph);
+                // self.buffer.append(glyph);
                 self.buffer.push(EMPTY_COLUMN);
             }
         }
     }
 
     fn show(&mut self) {
-        // TODO(tzn): Double buffering.
-        // let new_frame = (self.frame + 1) % 2;
-        let new_frame = 1;
-        self.bank(new_frame);
-        for y in 0..7 {
-            for x in 0..17 {
-                let offset = if x >= 8 {
-                    (x - 8) * 16 + y
-                } else {
-                    (8 - x) * 16 - (y + 2)
-                };
-                let value = match self.buffer.get(self.scroll + x as usize) {
-                    Some(column) => column[y as usize],
-                    None => 0,
-                };
-                match self.device.smbus_write_byte_data(COLOR_OFFSET + offset, value) {
-                    Ok(_) => {}
-                    Err(err) => println!("error writing to i2c device: {}", err),
-                };
-            }
-        }
-        self.frame(new_frame);
-        self.frame = new_frame;
-    }
-
-    fn test(&mut self) {
-        self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
-        self.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-
-        for _ in 0..3000 {
-            self.show();
-            std::thread::sleep(std::time::Duration::from_millis(100));
-            self.scroll();
-        }
+        self.projector.project(&self.buffer);
     }
 }
 
 fn main() {
-    font();
     println!("start");
-    let mut d = Display::new();
-    d.test();
+
+    let mut projector = I2CProjector::new();
+    let mut d = Display::new(&mut projector);
+
+    d.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+    for _ in 0..3000 {
+        d.show();
+        std::thread::sleep(std::time::Duration::from_millis(100));
+        d.scroll();
+    }
+
     println!("end");
 }
