@@ -32,7 +32,7 @@ impl<'a> Display<'a> {
     }
 
     fn set_pixel(&mut self, x: usize, y: usize, value: u8) {
-        if y >= 7 {
+        if y >= DISPLAY_HEIGHT {
             return;
         }
         if x >= self.buffer.len() {
@@ -58,7 +58,8 @@ impl<'a> Display<'a> {
     }
 
     fn show(&mut self) {
-        let buffer: Vec<Column> = self.buffer.iter().skip(self.scroll).take(17).cloned().collect();
+        let buffer: Vec<Column> =
+            self.buffer.iter().skip(self.scroll).take(DISPLAY_WIDTH).cloned().collect();
         self.projector.project(&buffer);
     }
 }

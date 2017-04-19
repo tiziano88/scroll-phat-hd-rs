@@ -83,8 +83,8 @@ impl Projector for I2CProjector {
         // let new_frame = (self.frame + 1) % 2;
         let new_frame = 1;
         self.bank(new_frame);
-        for y in 0..7 {
-            for x in 0..17 {
+        for y in 0..DISPLAY_HEIGHT {
+            for x in 0..DISPLAY_WIDTH {
                 let offset = if x >= 8 {
                     (x - 8) * 16 + y
                 } else {
@@ -95,7 +95,7 @@ impl Projector for I2CProjector {
                     None => 0,
                 };
                 self.device
-                    .smbus_write_byte_data(COLOR_OFFSET + offset, value)
+                    .smbus_write_byte_data(COLOR_OFFSET + offset as u8, value)
                     .unwrap();
             }
         }
