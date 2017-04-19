@@ -49,22 +49,25 @@ impl<'a> Display<'a> {
         let mut offset = 0;
         for c in text.chars() {
             if let Some(glyph) = font.get(&c) {
-                // XXX
-                // self.buffer.append(glyph);
+                for c in glyph {
+                    self.buffer.push(*c);
+                }
                 self.buffer.push(EMPTY_COLUMN);
             }
         }
     }
 
     fn show(&mut self) {
-        self.projector.project(&self.buffer);
+        let buffer: Vec<Column> = self.buffer.iter().skip(self.scroll).take(17).cloned().collect();
+        self.projector.project(&buffer);
     }
 }
 
 fn main() {
     println!("start");
 
-    let mut projector = I2CProjector::new();
+    // let mut projector = I2CProjector::new();
+    let mut projector = TermProjector::new();
     let mut d = Display::new(&mut projector);
 
     d.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");

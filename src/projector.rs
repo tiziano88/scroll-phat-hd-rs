@@ -102,3 +102,25 @@ impl Projector for I2CProjector {
         self.frame = new_frame;
     }
 }
+
+pub struct TermProjector {}
+
+impl TermProjector {
+    pub fn new() -> TermProjector {
+        TermProjector {}
+    }
+}
+
+impl Projector for TermProjector {
+    fn project(&mut self, buffer: &[Column]) {
+        print!("-------\n");
+        for col in buffer {
+            for c in col {
+                let v = if *c == 0 { ' ' } else { '#' };
+                print!("{}", v);
+            }
+            print!("\n");
+        }
+        print!("-------\n");
+    }
+}
