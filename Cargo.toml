@@ -5,5 +5,4 @@ authors = ["Tiziano Santoro <tiziano88@gmail.com>"]
 
 [dependencies]
 i2cdev = "0.3"
-rand = "0.3"
 termion = "1.0"

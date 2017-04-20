@@ -1,5 +1,3 @@
-extern crate rand;
-
 mod font;
 mod types;
 mod projector;
