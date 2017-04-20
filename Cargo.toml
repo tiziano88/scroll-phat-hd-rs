@@ -2,6 +2,8 @@
 name = "scroll_phat_hd"
 version = "0.1.0"
 authors = ["Tiziano Santoro <tiziano88@gmail.com>"]
+description = "Scroll Phat HD"
+license = "MIT"
 
 [dependencies]
 i2cdev = "0.3"
