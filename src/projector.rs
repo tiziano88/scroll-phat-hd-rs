@@ -2,7 +2,7 @@ extern crate i2cdev;
 extern crate termion;
 
 use self::i2cdev::core::I2CDevice;
-use self::i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
+use self::i2cdev::linux::LinuxI2CDevice;
 
 use std;
 use types::*;
@@ -39,7 +39,6 @@ pub trait Projector {
 pub struct I2CProjector {
     device: LinuxI2CDevice,
     frame: u8,
-    brightness: u8,
 }
 
 impl I2CProjector {
@@ -49,7 +48,6 @@ impl I2CProjector {
         I2CProjector {
             device: d,
             frame: 0,
-            brightness: 0x0F,
         }
     }
 

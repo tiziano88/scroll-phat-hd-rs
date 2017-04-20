@@ -2,8 +2,6 @@ mod font;
 mod types;
 mod projector;
 
-use std::collections::HashMap;
-
 pub use projector::*;
 pub use types::*;
 
@@ -43,8 +41,6 @@ impl<'a> Display<'a> {
 
     pub fn set_text(&mut self, text: &str) {
         let font = font::font();
-        let brightness = 0x0F;
-        let mut offset = 0;
         for c in text.chars() {
             if let Some(glyph) = font.get(&c) {
                 for c in glyph {
