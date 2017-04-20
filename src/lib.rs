@@ -6,17 +6,17 @@ mod projector;
 
 use std::collections::HashMap;
 
-use projector::*;
-use types::*;
+pub use projector::*;
+pub use types::*;
 
-struct Display<'a> {
+pub struct Display<'a> {
     scroll: usize,
     buffer: Vec<Column>,
     projector: &'a mut Projector,
 }
 
 impl<'a> Display<'a> {
-    fn new(projector: &'a mut Projector) -> Display {
+    pub fn new(projector: &'a mut Projector) -> Display {
         Display {
             scroll: 0,
             buffer: vec![],
@@ -24,14 +24,14 @@ impl<'a> Display<'a> {
         }
     }
 
-    fn scroll(&mut self) {
+    pub fn scroll(&mut self) {
         self.scroll += 1;
         if self.scroll >= self.buffer.len() {
             self.scroll = 0;
         }
     }
 
-    fn set_pixel(&mut self, x: usize, y: usize, value: u8) {
+    pub fn set_pixel(&mut self, x: usize, y: usize, value: u8) {
         if y >= DISPLAY_HEIGHT {
             return;
         }
@@ -43,7 +43,7 @@ impl<'a> Display<'a> {
         self.buffer[x][y] = value;
     }
 
-    fn set_text(&mut self, text: &str) {
+    pub fn set_text(&mut self, text: &str) {
         let font = font::font();
         let brightness = 0x0F;
         let mut offset = 0;
@@ -57,26 +57,9 @@ impl<'a> Display<'a> {
         }
     }
 
-    fn show(&mut self) {
+    pub fn show(&mut self) {
         let buffer: Vec<Column> =
             self.buffer.iter().skip(self.scroll).take(DISPLAY_WIDTH).cloned().collect();
         self.projector.project(&buffer);
     }
-}
-
-fn main() {
-    println!("start");
-
-    // let mut projector = I2CProjector::new();
-    let mut projector = TermProjector::new();
-    let mut d = Display::new(&mut projector);
-
-    d.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-    for _ in 0..3000 {
-        d.show();
-        std::thread::sleep(std::time::Duration::from_millis(100));
-        d.scroll();
-    }
-
-    println!("end");
 }

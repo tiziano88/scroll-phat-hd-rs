@@ -1,5 +1,5 @@
 [root]
-name = "scroll-phat-hd-rs"
+name = "scroll_phat_hd"
 version = "0.1.0"
 dependencies = [
  "i2cdev 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
