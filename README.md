@@ -9,3 +9,7 @@ HD](https://shop.pimoroni.com/products/scroll-phat-hd) using
 `rustup target add arm-unknown-linux-gnueabi`
 
 `apt-get install gcc-arm-linux-gnueabi`
+
+# Run
+
+`cargo run --example simple`
