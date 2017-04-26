@@ -1,3 +1,4 @@
+#[cfg(unix)]
 extern crate i2cdev;
 extern crate termion;
 
