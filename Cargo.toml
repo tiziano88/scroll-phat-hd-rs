@@ -6,5 +6,7 @@ description = "Scroll Phat HD"
 license = "MIT"
 
 [dependencies]
-i2cdev = "0.3"
 termion = "1.0"
+
+[target.'cfg(unix)'.dependencies]
+i2cdev = "0.3"
