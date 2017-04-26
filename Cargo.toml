@@ -8,5 +8,5 @@ license = "MIT"
 [dependencies]
 termion = "1.0"
 
-[target.'cfg(unix)'.dependencies]
+[target.'cfg(target_os = "linux")'.dependencies]
 i2cdev = "0.3"

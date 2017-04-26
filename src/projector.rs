@@ -1,10 +1,10 @@
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 extern crate i2cdev;
 extern crate termion;
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 use self::i2cdev::core::I2CDevice;
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 use self::i2cdev::linux::LinuxI2CDevice;
 
 use std;
@@ -39,13 +39,13 @@ pub trait Projector {
     fn project(&mut self, &[Column]);
 }
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 pub struct I2CProjector {
     device: LinuxI2CDevice,
     frame: u8,
 }
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 impl I2CProjector {
     pub fn new() -> I2CProjector {
         let d = LinuxI2CDevice::new("/dev/i2c-1", ADDRESS).unwrap();
@@ -80,7 +80,7 @@ impl I2CProjector {
     }
 }
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 impl Projector for I2CProjector {
     fn project(&mut self, buffer: &[Column]) {
         // TODO(tzn): Double buffering.
