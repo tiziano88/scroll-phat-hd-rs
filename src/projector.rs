@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 #[cfg(target_os = "linux")]
 extern crate i2cdev;
 extern crate termion;
