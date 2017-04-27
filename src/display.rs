@@ -39,7 +39,7 @@ const ADDRESS: u16 = 0x74;
 
 /// Represents a device capable of displaying a rectangular bitmap buffer.
 pub trait Display {
-    fn show(&mut self, &[Column]);
+    fn show(&mut self, buffer: &[Column]);
 }
 
 #[cfg(target_os = "linux")]
