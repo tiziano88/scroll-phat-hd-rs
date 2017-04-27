@@ -4,14 +4,14 @@ fn main() {
     println!("start");
 
     // let mut projector = I2CProjector::new();
-    let mut projector = scroll_phat_hd::TermProjector::new();
-    let mut d = scroll_phat_hd::Display::new(&mut projector);
+    let mut display = scroll_phat_hd::TermDisplay::new();
+    let mut scroller = scroll_phat_hd::Scroller::new(&mut display);
 
-    d.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+    scroller.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
     for _ in 0..3000 {
-        d.show();
+        scroller.show();
         std::thread::sleep(std::time::Duration::from_millis(100));
-        d.scroll();
+        scroller.scroll();
     }
 
     println!("end");

@@ -1,22 +1,22 @@
 mod font;
 mod types;
-mod projector;
+mod display;
 
-pub use projector::*;
+pub use display::*;
 pub use types::*;
 
-pub struct Display<'a> {
+pub struct Scroller<'a> {
     scroll: usize,
     buffer: Vec<Column>,
-    projector: &'a mut Projector,
+    display: &'a mut Display,
 }
 
-impl<'a> Display<'a> {
-    pub fn new(projector: &'a mut Projector) -> Display {
-        Display {
+impl<'a> Scroller<'a> {
+    pub fn new(display: &'a mut Display) -> Scroller {
+        Scroller {
             scroll: 0,
             buffer: vec![],
-            projector: projector,
+            display: display,
         }
     }
 
@@ -54,6 +54,6 @@ impl<'a> Display<'a> {
     pub fn show(&mut self) {
         let buffer: Vec<Column> =
             self.buffer.iter().skip(self.scroll).take(DISPLAY_WIDTH).cloned().collect();
-        self.projector.project(&buffer);
+        self.display.show(&buffer);
     }
 }

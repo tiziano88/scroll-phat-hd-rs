@@ -37,22 +37,22 @@ const COLOR_OFFSET: u8 = 0x24;
 
 const ADDRESS: u16 = 0x74;
 
-pub trait Projector {
-    fn project(&mut self, &[Column]);
+pub trait Display {
+    fn show(&mut self, &[Column]);
 }
 
 #[cfg(target_os = "linux")]
-pub struct I2CProjector {
+pub struct I2CDisplay {
     device: LinuxI2CDevice,
     frame: u8,
 }
 
 #[cfg(target_os = "linux")]
-impl I2CProjector {
-    pub fn new() -> I2CProjector {
+impl I2CDisplay {
+    pub fn new() -> I2CDisplay {
         let d = LinuxI2CDevice::new("/dev/i2c-1", ADDRESS).unwrap();
         // self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
-        I2CProjector {
+        I2CDisplay {
             device: d,
             frame: 0,
         }
@@ -83,8 +83,8 @@ impl I2CProjector {
 }
 
 #[cfg(target_os = "linux")]
-impl Projector for I2CProjector {
-    fn project(&mut self, buffer: &[Column]) {
+impl Display for I2CDisplay {
+    fn show(&mut self, buffer: &[Column]) {
         // TODO(tzn): Double buffering.
         // let new_frame = (self.frame + 1) % 2;
         let new_frame = 1;
@@ -110,16 +110,16 @@ impl Projector for I2CProjector {
     }
 }
 
-pub struct TermProjector {}
+pub struct TermDisplay {}
 
-impl TermProjector {
-    pub fn new() -> TermProjector {
-        TermProjector {}
+impl TermDisplay {
+    pub fn new() -> TermDisplay {
+        TermDisplay {}
     }
 }
 
-impl Projector for TermProjector {
-    fn project(&mut self, buffer: &[Column]) {
+impl Display for TermDisplay {
+    fn show(&mut self, buffer: &[Column]) {
         print!("{}", termion::clear::All);
         for x in 0..buffer.len() {
             let col = &buffer[x];
