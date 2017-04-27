@@ -12,4 +12,4 @@ HD](https://shop.pimoroni.com/products/scroll-phat-hd) using
 
 # Run
 
-`cargo run --example simple`
+`cargo run --example alphabet`
