@@ -21,6 +21,62 @@ fn make_glyph(v: [&'static str; 7]) -> Glyph {
 #[cfg_attr(rustfmt, rustfmt_skip)]
 pub fn font() -> HashMap<char, Glyph> {
     let mut glyphs = HashMap::new();
+    glyphs.insert('.', make_glyph([
+                  " " ,
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  "x"]));
+    glyphs.insert('!', make_glyph([
+                  " " ,
+                  "x",
+                  "x",
+                  "x",
+                  "x",
+                  " ",
+                  "x"]));
+    glyphs.insert(',', make_glyph([
+                  " " ,
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  "x",
+                  "x"]));
+    glyphs.insert('-', make_glyph([
+                  "   " ,
+                  "   ",
+                  "   ",
+                  "xxx",
+                  "   ",
+                  "   ",
+                  "   "]));
+    glyphs.insert('_', make_glyph([
+                  "   " ,
+                  "   ",
+                  "   ",
+                  "   ",
+                  "   ",
+                  "   ",
+                  "xxx"]));
+    glyphs.insert('+', make_glyph([
+                  "   " ,
+                  "   ",
+                  " x ",
+                  "xxx",
+                  " x ",
+                  "   ",
+                  "   "]));
+    glyphs.insert('=', make_glyph([
+                  "   " ,
+                  "   ",
+                  "xxx",
+                  "   ",
+                  "xxx",
+                  "   ",
+                  "   "]));
     glyphs.insert('0', make_glyph([
                   "    " ,
                   " xx ",
