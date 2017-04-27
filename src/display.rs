@@ -37,11 +37,13 @@ const COLOR_OFFSET: u8 = 0x24;
 
 const ADDRESS: u16 = 0x74;
 
+/// Represents a device capable of displaying a rectangular bitmap buffer.
 pub trait Display {
     fn show(&mut self, &[Column]);
 }
 
 #[cfg(target_os = "linux")]
+/// A Scroll pHAT HD device connected over I2C bus (e.g. on a Raspberry Pi).
 pub struct I2CDisplay {
     device: LinuxI2CDevice,
     frame: u8,
@@ -49,8 +51,11 @@ pub struct I2CDisplay {
 
 #[cfg(target_os = "linux")]
 impl I2CDisplay {
-    pub fn new() -> I2CDisplay {
-        let d = LinuxI2CDevice::new("/dev/i2c-1", ADDRESS).unwrap();
+    /// Creates a new I2CDisplay device using the I2C device identified by the provided
+    /// `device_id` (normally 1 or 2).
+    pub fn new(device_id: u8) -> I2CDisplay {
+        let device_path = format!("/dev/i2c-{}", device_id);
+        let d = LinuxI2CDevice::new(device_path, ADDRESS).unwrap();
         // self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
         I2CDisplay {
             device: d,
@@ -110,6 +115,7 @@ impl Display for I2CDisplay {
     }
 }
 
+/// A virtual display that outputs its buffer to the terminal from which the binary is attached.
 pub struct TermDisplay {}
 
 impl TermDisplay {
