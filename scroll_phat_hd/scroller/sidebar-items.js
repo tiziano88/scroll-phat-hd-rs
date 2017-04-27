@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Scroller",""]]});
+initSidebarItems({"struct":[["Scroller","A virtual scrollable buffer with a scoll offset defining a visible window on the buffer itself."]]});

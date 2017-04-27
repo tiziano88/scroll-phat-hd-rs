@@ -176,6 +176,12 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>)]</span>
 
@@ -216,11 +222,13 @@
 
 <span class='kw'>const</span> <span class='ident'>ADDRESS</span>: <span class='ident'>u16</span> <span class='op'>=</span> <span class='number'>0x74</span>;
 
+<span class='doccomment'>/// Represents a device capable of displaying a rectangular bitmap buffer.</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Display</span> {
     <span class='kw'>fn</span> <span class='ident'>show</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>&amp;</span>[<span class='ident'>Column</span>]);
 }
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;linux&quot;</span>)]</span>
+<span class='doccomment'>/// A Scroll pHAT HD device connected over I2C bus (e.g. on a Raspberry Pi).</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>I2CDisplay</span> {
     <span class='ident'>device</span>: <span class='ident'>LinuxI2CDevice</span>,
     <span class='ident'>frame</span>: <span class='ident'>u8</span>,
@@ -228,8 +236,11 @@
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;linux&quot;</span>)]</span>
 <span class='kw'>impl</span> <span class='ident'>I2CDisplay</span> {
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>I2CDisplay</span> {
-        <span class='kw'>let</span> <span class='ident'>d</span> <span class='op'>=</span> <span class='ident'>LinuxI2CDevice</span>::<span class='ident'>new</span>(<span class='string'>&quot;/dev/i2c-1&quot;</span>, <span class='ident'>ADDRESS</span>).<span class='ident'>unwrap</span>();
+    <span class='doccomment'>/// Creates a new I2CDisplay device using the I2C device identified by the provided</span>
+    <span class='doccomment'>/// `device_id` (normally 1 or 2).</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>device_id</span>: <span class='ident'>u8</span>) <span class='op'>-&gt;</span> <span class='ident'>I2CDisplay</span> {
+        <span class='kw'>let</span> <span class='ident'>device_path</span> <span class='op'>=</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;/dev/i2c-{}&quot;</span>, <span class='ident'>device_id</span>);
+        <span class='kw'>let</span> <span class='ident'>d</span> <span class='op'>=</span> <span class='ident'>LinuxI2CDevice</span>::<span class='ident'>new</span>(<span class='ident'>device_path</span>, <span class='ident'>ADDRESS</span>).<span class='ident'>unwrap</span>();
         <span class='comment'>// self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);</span>
         <span class='ident'>I2CDisplay</span> {
             <span class='ident'>device</span>: <span class='ident'>d</span>,
@@ -289,6 +300,7 @@
     }
 }
 
+<span class='doccomment'>/// A virtual display that outputs its buffer to the terminal from which the binary is attached.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>TermDisplay</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>TermDisplay</span> {
