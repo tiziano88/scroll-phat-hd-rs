@@ -10,7 +10,7 @@ use self::i2cdev::core::I2CDevice;
 use self::i2cdev::linux::LinuxI2CDevice;
 
 use std;
-use types::*;
+use shared::*;
 
 const MODE_REGISTER: u8 = 0x00;
 const FRAME_REGISTER: u8 = 0x01;

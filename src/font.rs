@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use types::*;
+use shared::*;
 
 fn make_glyph(v: [&'static str; 7]) -> Glyph {
     let width = v[0].len();

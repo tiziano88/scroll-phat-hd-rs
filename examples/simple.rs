@@ -1,11 +1,14 @@
 extern crate scroll_phat_hd;
 
+use scroll_phat_hd::display::*;
+use scroll_phat_hd::scroller::*;
+
 fn main() {
     println!("start");
 
     // let mut projector = I2CProjector::new();
-    let mut display = scroll_phat_hd::TermDisplay::new();
-    let mut scroller = scroll_phat_hd::Scroller::new(&mut display);
+    let mut display = TermDisplay::new();
+    let mut scroller = Scroller::new(&mut display);
 
     scroller.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
     for _ in 0..3000 {
