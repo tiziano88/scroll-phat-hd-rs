@@ -2,7 +2,10 @@
 name = "scroll_phat_hd"
 version = "0.2.0"
 authors = ["Tiziano Santoro <tiziano88@gmail.com>"]
-description = "Scroll Phat HD"
+documentation = "https://tiziano88.github.io/scroll-phat-hd-rs/scroll_phat_hd/index.html"
+description = """
+Scroll Phat HD library
+"""
 license = "MIT"
 
 [dependencies]
