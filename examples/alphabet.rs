@@ -10,7 +10,7 @@ fn main() {
     let mut display = TermDisplay::new();
     let mut scroller = Scroller::new(&mut display);
 
-    scroller.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+=-_,.!?");
+    scroller.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789+=-_,.!?");
     for _ in 0..3000 {
         scroller.show();
         std::thread::sleep(std::time::Duration::from_millis(100));
