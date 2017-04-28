@@ -116,6 +116,8 @@ impl Display for I2CDisplay {
 }
 
 /// A virtual display that outputs its buffer to the terminal from which the binary is attached.
+///
+/// Useful for debugging or prototyping, as it does not require a physical display to be connected.
 pub struct TermDisplay {}
 
 impl TermDisplay {
