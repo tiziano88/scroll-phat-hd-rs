@@ -16,4 +16,7 @@ HD](https://shop.pimoroni.com/products/scroll-phat-hd) using
 
 # Run
 
-`cargo run --example alphabet`
+To run the included examples:
+
+- `cargo run --example alphabet`
+- `cargo run --example counter`
