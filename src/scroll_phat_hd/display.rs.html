@@ -182,6 +182,8 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>)]</span>
 
@@ -301,6 +303,8 @@
 }
 
 <span class='doccomment'>/// A virtual display that outputs its buffer to the terminal from which the binary is attached.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// Useful for debugging or prototyping, as it does not require a physical display to be connected.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>TermDisplay</span> {}
 
 <span class='kw'>impl</span> <span class='ident'>TermDisplay</span> {
