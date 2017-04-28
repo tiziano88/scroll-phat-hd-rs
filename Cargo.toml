@@ -1,6 +1,6 @@
 [package]
 name = "scroll_phat_hd"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Tiziano Santoro <tiziano88@gmail.com>"]
 documentation = "https://tiziano88.github.io/scroll-phat-hd-rs/scroll_phat_hd/index.html"
 description = """
