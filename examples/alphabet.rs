@@ -6,7 +6,7 @@ use scroll_phat_hd::scroller::*;
 fn main() {
     println!("start");
 
-    // let mut projector = I2CProjector::new(1);
+    // let mut display = I2CDisplay::new(1);
     let mut display = TermDisplay::new();
     let mut scroller = Scroller::new(&mut display);
 
