@@ -64,12 +64,16 @@ impl I2CDisplay {
     }
 
     fn bank(&mut self, bank: u8) {
-        self.device.smbus_write_byte_data(BANK_ADDRESS, bank).unwrap();
+        self.device
+            .smbus_write_byte_data(BANK_ADDRESS, bank)
+            .unwrap();
     }
 
     fn register(&mut self, bank: u8, register: u8, value: u8) {
         self.bank(bank);
-        self.device.smbus_write_block_data(register, &[value]).unwrap();
+        self.device
+            .smbus_write_block_data(register, &[value])
+            .unwrap();
     }
 
     fn frame(&mut self, frame: u8) {
