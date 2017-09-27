@@ -15,15 +15,15 @@ use shared::*;
 /// └───────────╚═════════════════╝──────────────────────────────┘
 /// └──offset───┴─visible buffer──┘
 /// ```
-pub struct Scroller<'a> {
+pub struct Scroller<T: Display> {
     virtual_buffer: Vec<Column>,
     scroll_offset: usize,
-    display: &'a mut Display,
+    display: T,
 }
 
-impl<'a> Scroller<'a> {
+impl<T: Display> Scroller<T> {
     /// Create a new `Scroller` using the provided `Display`.
-    pub fn new(display: &'a mut Display) -> Scroller {
+    pub fn new(display: T) -> Scroller<T> {
         Scroller {
             virtual_buffer: vec![],
             scroll_offset: 0,

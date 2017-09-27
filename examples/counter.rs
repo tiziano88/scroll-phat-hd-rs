@@ -8,7 +8,7 @@ fn main() {
 
     // let mut display = I2CDisplay::new(1);
     let mut display = TermDisplay::new();
-    let mut scroller = Scroller::new(&mut display);
+    let mut scroller = Scroller::new(display);
 
     for i in 0..3000 {
         let v = format!("{}", i);
