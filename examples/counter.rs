@@ -6,8 +6,8 @@ use scroll_phat_hd::scroller::*;
 fn main() {
     println!("start");
 
-    // let mut display = I2CDisplay::new(1);
-    let mut display = TermDisplay::new();
+    // let display = I2CDisplay::new(1);
+    let display = TermDisplay::new();
     let mut scroller = Scroller::new(display);
 
     for i in 0..3000 {

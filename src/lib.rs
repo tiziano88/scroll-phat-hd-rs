@@ -3,7 +3,7 @@
 //! Sample usage:
 //!
 //! ```
-//! let mut display = scroll_phat_hd::display::TermDisplay::new();
+//! let display = scroll_phat_hd::display::TermDisplay::new();
 //! let mut scroller = scroll_phat_hd::scroller::Scroller::new(display);
 //! scroller.set_text("ABC");
 //! scroller.show();
