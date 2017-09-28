@@ -1,6 +1,6 @@
 [package]
 name = "scroll_phat_hd"
-version = "0.3.0"
+version = "0.3.1"
 keywords = ["scroll", "led", "matrix", "raspberry", "pi"]
 repository = "https://github.com/tiziano88/scroll-phat-hd-rs"
 homepage = "https://github.com/tiziano88/scroll-phat-hd-rs"
