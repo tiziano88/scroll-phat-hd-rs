@@ -56,28 +56,30 @@ impl I2CDisplay {
     pub fn new(device_id: u8) -> I2CDisplay {
         let device_path = format!("/dev/i2c-{}", device_id);
         let d = LinuxI2CDevice::new(device_path, ADDRESS).unwrap();
-        // self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
-        I2CDisplay {
+        let mut display = I2CDisplay {
             device: d,
             frame: 0,
-        }
+        };
+        display.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
+        display
     }
 
-    fn bank(&mut self, bank: u8) {
-        self.device
-            .smbus_write_byte_data(BANK_ADDRESS, bank)
-            .unwrap();
+    fn bank(&mut self, bank: u8) -> Result<(), i2cdev::linux::LinuxI2CError> {
+        self.device.smbus_write_byte_data(BANK_ADDRESS, bank)
     }
 
-    fn register(&mut self, bank: u8, register: u8, value: u8) {
+    fn register(
+        &mut self,
+        bank: u8,
+        register: u8,
+        value: u8,
+    ) -> Result<(), i2cdev::linux::LinuxI2CError> {
         self.bank(bank);
-        self.device
-            .smbus_write_block_data(register, &[value])
-            .unwrap();
+        self.device.smbus_write_block_data(register, &[value])
     }
 
-    fn frame(&mut self, frame: u8) {
-        self.register(CONFIG_BANK, FRAME_REGISTER, frame);
+    fn frame(&mut self, frame: u8) -> Result<(), i2cdev::linux::LinuxI2CError> {
+        self.register(CONFIG_BANK, FRAME_REGISTER, frame)
     }
 
     fn reset(&mut self) {
@@ -86,8 +88,8 @@ impl I2CDisplay {
         self.sleep(false);
     }
 
-    fn sleep(&mut self, value: bool) {
-        self.register(CONFIG_BANK, SHUTDOWN_REGISTER, if value { 0 } else { 1 });
+    fn sleep(&mut self, value: bool) -> Result<(), i2cdev::linux::LinuxI2CError> {
+        self.register(CONFIG_BANK, SHUTDOWN_REGISTER, if value { 0 } else { 1 })
     }
 }
 
@@ -110,8 +112,7 @@ impl Display for I2CDisplay {
                     None => 0,
                 };
                 self.device
-                    .smbus_write_byte_data(COLOR_OFFSET + offset as u8, value)
-                    .unwrap();
+                    .smbus_write_byte_data(COLOR_OFFSET + offset as u8, value);
             }
         }
         self.frame(new_frame);
@@ -175,13 +176,22 @@ impl Display for UnicodeDisplay {
                 let v = if c == 0 { '░' } else { '▓' };
                 println!("{}{}", termion::cursor::Goto(x as u16 + 2, y as u16 + 2), v);
             }
-            println!("{}═", termion::cursor::Goto(x as u16 + 2, col.len() as u16 + 2));
+            println!(
+                "{}═",
+                termion::cursor::Goto(x as u16 + 2, col.len() as u16 + 2)
+            );
         }
 
         println!("{}╗", termion::cursor::Goto(buffer.len() as u16 + 1, 1));
         for y in 0..col.len() {
-            println!("{}║", termion::cursor::Goto(buffer.len() as u16 + 1, y as u16 + 2));
+            println!(
+                "{}║",
+                termion::cursor::Goto(buffer.len() as u16 + 1, y as u16 + 2)
+            );
         }
-        println!("{}╝", termion::cursor::Goto(buffer.len() as u16 + 1, col.len() as u16 + 2));
+        println!(
+            "{}╝",
+            termion::cursor::Goto(buffer.len() as u16 + 1, col.len() as u16 + 2)
+        );
     }
 }
