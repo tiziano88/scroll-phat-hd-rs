@@ -53,6 +53,22 @@ pub fn font() -> HashMap<char, Glyph> {
                   " ",
                   "x",
                   "x"]));
+    glyphs.insert(';', make_glyph([
+                  " " ,
+                  " ",
+                  " ",
+                  "x",
+                  " ",
+                  "x",
+                  "x"]));
+    glyphs.insert(':', make_glyph([
+                  " " ,
+                  " ",
+                  "x",
+                  " ",
+                  " ",
+                  "x",
+                  " "]));
     glyphs.insert('\'', make_glyph([
                   "x" ,
                   "x",
