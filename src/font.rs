@@ -85,6 +85,22 @@ pub fn font() -> HashMap<char, Glyph> {
                   "   ",
                   "   ",
                   "   "]));
+    glyphs.insert('\\', make_glyph([
+                  "   ",
+                  "x  ",
+                  "x  ",
+                  " x ",
+                  " x ",
+                  "  x",
+                  "  x"]));
+    glyphs.insert('/', make_glyph([
+                  "   ",
+                  "  x",
+                  "  x",
+                  " x ",
+                  " x ",
+                  "x  ",
+                  "x  "]));
     glyphs.insert('°', make_glyph([
                   "xxx" ,
                   "x x",
@@ -93,6 +109,14 @@ pub fn font() -> HashMap<char, Glyph> {
                   "   ",
                   "   ",
                   "   "]));
+    glyphs.insert('#', make_glyph([
+                  "     " ,
+                  " x x ",
+                  "xxxxx",
+                  " x x ",
+                  "xxxxx",
+                  " x x ",
+                  "     "]));
     glyphs.insert('-', make_glyph([
                   "   " ,
                   "   ",
