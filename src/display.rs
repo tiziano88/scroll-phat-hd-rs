@@ -60,7 +60,50 @@ impl I2CDisplay {
             device: d,
             frame: 0,
         };
-        display.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
+
+        // Display initialization
+        display.reset();
+
+        display.device.smbus_write_byte_data(BANK_ADDRESS, CONFIG_BANK);
+        // Switch to Picture Mode
+        display.device.smbus_write_byte_data(MODE_REGISTER, PICTURE_MODE);
+        // Disable audio sync
+        display.device.smbus_write_byte_data(AUDIOSYNC_REGISTER, 0);
+
+        // Initialize frame 1
+        display.device.smbus_write_byte_data(BANK_ADDRESS, 1);
+        // Turn off blinking for all LEDs
+        for i in 0..17 {
+            display.device.smbus_write_byte_data(BLINK_OFFSET + i, 0);
+        }
+        // Set the PWM duty cycle for all LEDs to 0%
+        for i in 0..17 {
+            for j in 0..7 {
+                display.device.smbus_write_byte_data(COLOR_OFFSET + (i * 8) + j, 0);
+            }
+        }
+        // Turn all LEDs "on"
+        for i in 0..17 {
+            display.device.smbus_write_byte_data(ENABLE_OFFSET + i, 127);
+        }
+
+        // Initialize frame 0
+        display.device.smbus_write_byte_data(BANK_ADDRESS, 0);
+        // Turn off blinking for all LEDs
+        for i in 0..17 {
+            display.device.smbus_write_byte_data(BLINK_OFFSET + i, 0);
+        }
+        // Set the PWM duty cycle for all LEDs to 0%
+        for i in 0..17 {
+            for j in 0..7 {
+                display.device.smbus_write_byte_data(COLOR_OFFSET + (i * 8) + j, 0);
+            }
+        }
+        // Turn all LEDs "on"
+        for i in 0..17 {
+            display.device.smbus_write_byte_data(ENABLE_OFFSET + i, 127);
+        }
+
         display
     }
 
@@ -75,7 +118,7 @@ impl I2CDisplay {
         value: u8,
     ) -> Result<(), i2cdev::linux::LinuxI2CError> {
         self.bank(bank);
-        self.device.smbus_write_block_data(register, &[value])
+        self.device.smbus_write_byte_data(register, value)
     }
 
     fn frame(&mut self, frame: u8) -> Result<(), i2cdev::linux::LinuxI2CError> {
