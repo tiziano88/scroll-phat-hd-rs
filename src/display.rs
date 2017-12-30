@@ -111,13 +111,13 @@ impl I2CDisplay {
             self.write_data(BANK_ADDRESS, &[frame])?;
 
             // Turn off blinking for all LEDs.
-            self.write_data(BLINK_OFFSET, &[0; LED_COLUMNS])?;
+            self.write_data(BLINK_OFFSET, &[0; LED_COLUMNS * LED_ROWS])?;
 
             // Set the PWM duty cycle for all LEDs to 0%.
             self.write_data(COLOR_OFFSET, &[0; LED_COLUMNS * LED_ROWS])?;
 
             // Turn all LEDs "on".
-            self.write_data(ENABLE_OFFSET, &[127; LED_COLUMNS])?;
+            self.write_data(ENABLE_OFFSET, &[127; LED_COLUMNS * LED_ROWS])?;
         }
 
         Ok(())
@@ -131,6 +131,7 @@ impl I2CDisplay {
 #[cfg(target_os = "linux")]
 impl Display for I2CDisplay {
     fn show(&mut self, buffer: &[Column]) {
+        // Double buffering with frames 0 and 1.
         let new_frame = (self.frame + 1) % 2;
         self.bank(new_frame);
         for y in 0..DISPLAY_HEIGHT {
