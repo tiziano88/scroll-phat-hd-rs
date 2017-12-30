@@ -86,7 +86,7 @@ impl<'a> Scroller<'a> {
     /// Sends the visible buffer to the output display.
     pub fn show(&mut self) {
         let visible_buffer = self.visible_buffer();
-        self.display.show(&visible_buffer);
+        self.display.show(&visible_buffer).unwrap();
     }
 
     /// Clears the virtual buffer.

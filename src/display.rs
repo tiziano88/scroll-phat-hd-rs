@@ -42,7 +42,7 @@ const LED_ROWS: usize = 7;
 
 /// Represents a device capable of displaying a rectangular bitmap buffer.
 pub trait Display {
-    fn show(&mut self, buffer: &[Column]);
+    fn show(&mut self, buffer: &[Column]) -> Result<(), LinuxI2CError>;
 }
 
 #[cfg(target_os = "linux")]
@@ -74,7 +74,7 @@ impl I2CDisplay {
     }
 
     fn register(&mut self, bank: u8, register: u8, value: u8) -> Result<(), LinuxI2CError> {
-        self.bank(bank);
+        self.bank(bank)?;
         self.write_data(register, &[value])
     }
 
@@ -130,10 +130,10 @@ impl I2CDisplay {
 
 #[cfg(target_os = "linux")]
 impl Display for I2CDisplay {
-    fn show(&mut self, buffer: &[Column]) {
+    fn show(&mut self, buffer: &[Column]) -> Result<(), LinuxI2CError> {
         // Double buffering with frames 0 and 1.
         let new_frame = (self.frame + 1) % 2;
-        self.bank(new_frame);
+        self.bank(new_frame)?;
         for y in 0..DISPLAY_HEIGHT {
             for x in 0..DISPLAY_WIDTH {
                 let offset = if x >= 8 {
@@ -145,11 +145,12 @@ impl Display for I2CDisplay {
                     Some(column) => column[y as usize],
                     None => 0,
                 };
-                self.write_data(COLOR_OFFSET + offset as u8, &[value]);
+                self.write_data(COLOR_OFFSET + offset as u8, &[value])?;
             }
         }
-        self.frame(new_frame);
+        self.frame(new_frame)?;
         self.frame = new_frame;
+        Ok(())
     }
 }
 
@@ -165,7 +166,7 @@ impl TermDisplay {
 }
 
 impl Display for TermDisplay {
-    fn show(&mut self, buffer: &[Column]) {
+    fn show(&mut self, buffer: &[Column]) -> Result<(), LinuxI2CError> {
         print!("{}", termion::clear::All);
         for x in 0..buffer.len() {
             let col = &buffer[x];
@@ -175,6 +176,7 @@ impl Display for TermDisplay {
                 println!("{}{}", termion::cursor::Goto(x as u16 + 1, y as u16 + 1), v);
             }
         }
+        Ok(())
     }
 }
 
@@ -190,7 +192,7 @@ impl UnicodeDisplay {
 }
 
 impl Display for UnicodeDisplay {
-    fn show(&mut self, buffer: &[Column]) {
+    fn show(&mut self, buffer: &[Column]) -> Result<(), LinuxI2CError> {
         print!("{}", termion::clear::All);
 
         let col = &buffer[0];
@@ -226,5 +228,7 @@ impl Display for UnicodeDisplay {
             "{}╝",
             termion::cursor::Goto(buffer.len() as u16 + 1, col.len() as u16 + 2)
         );
+
+        Ok(())
     }
 }
