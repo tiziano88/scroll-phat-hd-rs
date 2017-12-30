@@ -64,7 +64,7 @@ impl I2CDisplay {
             frame: 0,
         };
 
-        display.init_display();
+        display.init_display().unwrap();
 
         display
     }
@@ -99,34 +99,37 @@ impl I2CDisplay {
         Ok(())
     }
 
-    fn reset_display(&mut self) {
-        self.sleep(true);
+    fn reset_display(&mut self) -> Result<(), i2cdev::linux::LinuxI2CError> {
+        self.sleep(true)?;
         std::thread::sleep(std::time::Duration::from_millis(10));
-        self.sleep(false);
+        self.sleep(false)?;
+        Ok(())
     }
 
-    fn init_display(&mut self) {
-        self.reset_display();
+    fn init_display(&mut self) -> Result<(), i2cdev::linux::LinuxI2CError> {
+        self.reset_display()?;
 
         // Switch to Picture Mode.
-        self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE);
+        self.register(CONFIG_BANK, MODE_REGISTER, PICTURE_MODE)?;
 
         // Disable audio sync.
-        self.register(CONFIG_BANK, AUDIOSYNC_REGISTER, 0);
+        self.register(CONFIG_BANK, AUDIOSYNC_REGISTER, 0)?;
 
         // Initialize frames 0 and 1.
         for frame in 0..2 {
-            self.write_data(BANK_ADDRESS, &[frame]);
+            self.write_data(BANK_ADDRESS, &[frame])?;
 
             // Turn off blinking for all LEDs.
-            self.write_data(BLINK_OFFSET, &[0; LED_COLUMNS]);
+            self.write_data(BLINK_OFFSET, &[0; LED_COLUMNS])?;
 
             // Set the PWM duty cycle for all LEDs to 0%.
-            self.write_data(COLOR_OFFSET, &[0; LED_COLUMNS * LED_ROWS]);
+            self.write_data(COLOR_OFFSET, &[0; LED_COLUMNS * LED_ROWS])?;
 
             // Turn all LEDs "on".
-            self.write_data(ENABLE_OFFSET, &[127; LED_COLUMNS]);
+            self.write_data(ENABLE_OFFSET, &[127; LED_COLUMNS])?;
         }
+
+        Ok(())
     }
 
     fn sleep(&mut self, value: bool) -> Result<(), i2cdev::linux::LinuxI2CError> {
