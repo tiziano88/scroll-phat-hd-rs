@@ -7,7 +7,7 @@ extern crate termion;
 #[cfg(target_os = "linux")]
 use self::i2cdev::core::I2CDevice;
 #[cfg(target_os = "linux")]
-use self::i2cdev::linux::LinuxI2CDevice;
+use self::i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
 
 use std;
 use shared::*;
@@ -69,29 +69,20 @@ impl I2CDisplay {
         display
     }
 
-    fn bank(&mut self, bank: u8) -> Result<(), i2cdev::linux::LinuxI2CError> {
+    fn bank(&mut self, bank: u8) -> Result<(), LinuxI2CError> {
         self.write_data(BANK_ADDRESS, &[bank])
     }
 
-    fn register(
-        &mut self,
-        bank: u8,
-        register: u8,
-        value: u8,
-    ) -> Result<(), i2cdev::linux::LinuxI2CError> {
+    fn register(&mut self, bank: u8, register: u8, value: u8) -> Result<(), LinuxI2CError> {
         self.bank(bank);
         self.write_data(register, &[value])
     }
 
-    fn frame(&mut self, frame: u8) -> Result<(), i2cdev::linux::LinuxI2CError> {
+    fn frame(&mut self, frame: u8) -> Result<(), LinuxI2CError> {
         self.register(CONFIG_BANK, FRAME_REGISTER, frame)
     }
 
-    fn write_data(
-        &mut self,
-        base_address: u8,
-        data: &[u8],
-    ) -> Result<(), i2cdev::linux::LinuxI2CError> {
+    fn write_data(&mut self, base_address: u8, data: &[u8]) -> Result<(), LinuxI2CError> {
         for i in 0..data.len() {
             self.device
                 .smbus_write_byte_data(base_address + (i as u8), data[i])?;
@@ -99,14 +90,14 @@ impl I2CDisplay {
         Ok(())
     }
 
-    fn reset_display(&mut self) -> Result<(), i2cdev::linux::LinuxI2CError> {
+    fn reset_display(&mut self) -> Result<(), LinuxI2CError> {
         self.sleep(true)?;
         std::thread::sleep(std::time::Duration::from_millis(10));
         self.sleep(false)?;
         Ok(())
     }
 
-    fn init_display(&mut self) -> Result<(), i2cdev::linux::LinuxI2CError> {
+    fn init_display(&mut self) -> Result<(), LinuxI2CError> {
         self.reset_display()?;
 
         // Switch to Picture Mode.
@@ -132,7 +123,7 @@ impl I2CDisplay {
         Ok(())
     }
 
-    fn sleep(&mut self, value: bool) -> Result<(), i2cdev::linux::LinuxI2CError> {
+    fn sleep(&mut self, value: bool) -> Result<(), LinuxI2CError> {
         self.register(CONFIG_BANK, SHUTDOWN_REGISTER, if value { 0 } else { 1 })
     }
 }
