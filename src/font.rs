@@ -149,6 +149,46 @@ pub fn font() -> HashMap<char, Glyph> {
                   "xxx",
                   "   ",
                   "   "]));
+    glyphs.insert('(', make_glyph([
+                  "  ",
+                  " x",
+                  "x ",
+                  "x ",
+                  "x ",
+                  "x ",
+                  " x"]));
+    glyphs.insert(')', make_glyph([
+                  "  ",
+                  "x ",
+                  " x",
+                  " x",
+                  " x",
+                  " x",
+                  "x "]));
+    glyphs.insert('[', make_glyph([
+                  "  ",
+                  "xx",
+                  "x ",
+                  "x ",
+                  "x ",
+                  "x ",
+                  "xx"]));
+    glyphs.insert(']', make_glyph([
+                  "  ",
+                  "xx",
+                  " x",
+                  " x",
+                  " x",
+                  " x",
+                  "xx"]));
+    glyphs.insert('@', make_glyph([
+                  " xxx ",
+                  "x   x",
+                  "x xxx",
+                  "x x x",
+                  "x xxx",
+                  "x    ",
+                  " xxxx"]));
     glyphs.insert('0', make_glyph([
                   "    ",
                   " xx ",
