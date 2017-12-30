@@ -61,48 +61,7 @@ impl I2CDisplay {
             frame: 0,
         };
 
-        // Display initialization
-        display.reset();
-
-        display.device.smbus_write_byte_data(BANK_ADDRESS, CONFIG_BANK);
-        // Switch to Picture Mode
-        display.device.smbus_write_byte_data(MODE_REGISTER, PICTURE_MODE);
-        // Disable audio sync
-        display.device.smbus_write_byte_data(AUDIOSYNC_REGISTER, 0);
-
-        // Initialize frame 1
-        display.device.smbus_write_byte_data(BANK_ADDRESS, 1);
-        // Turn off blinking for all LEDs
-        for i in 0..17 {
-            display.device.smbus_write_byte_data(BLINK_OFFSET + i, 0);
-        }
-        // Set the PWM duty cycle for all LEDs to 0%
-        for i in 0..17 {
-            for j in 0..7 {
-                display.device.smbus_write_byte_data(COLOR_OFFSET + (i * 8) + j, 0);
-            }
-        }
-        // Turn all LEDs "on"
-        for i in 0..17 {
-            display.device.smbus_write_byte_data(ENABLE_OFFSET + i, 127);
-        }
-
-        // Initialize frame 0
-        display.device.smbus_write_byte_data(BANK_ADDRESS, 0);
-        // Turn off blinking for all LEDs
-        for i in 0..17 {
-            display.device.smbus_write_byte_data(BLINK_OFFSET + i, 0);
-        }
-        // Set the PWM duty cycle for all LEDs to 0%
-        for i in 0..17 {
-            for j in 0..7 {
-                display.device.smbus_write_byte_data(COLOR_OFFSET + (i * 8) + j, 0);
-            }
-        }
-        // Turn all LEDs "on"
-        for i in 0..17 {
-            display.device.smbus_write_byte_data(ENABLE_OFFSET + i, 127);
-        }
+        display.init_display();
 
         display
     }
@@ -125,10 +84,57 @@ impl I2CDisplay {
         self.register(CONFIG_BANK, FRAME_REGISTER, frame)
     }
 
-    fn reset(&mut self) {
+    fn reset_display(&mut self) {
         self.sleep(true);
         std::thread::sleep(std::time::Duration::from_millis(10));
         self.sleep(false);
+    }
+
+    fn init_display(&mut self) {
+        self.reset_display();
+
+        self.device.smbus_write_byte_data(BANK_ADDRESS, CONFIG_BANK);
+        // Switch to Picture Mode
+        self.device
+            .smbus_write_byte_data(MODE_REGISTER, PICTURE_MODE);
+        // Disable audio sync
+        self.device.smbus_write_byte_data(AUDIOSYNC_REGISTER, 0);
+
+        // Initialize frame 1
+        self.device.smbus_write_byte_data(BANK_ADDRESS, 1);
+        // Turn off blinking for all LEDs
+        for i in 0..17 {
+            self.device.smbus_write_byte_data(BLINK_OFFSET + i, 0);
+        }
+        // Set the PWM duty cycle for all LEDs to 0%
+        for i in 0..17 {
+            for j in 0..7 {
+                self.device
+                    .smbus_write_byte_data(COLOR_OFFSET + (i * 8) + j, 0);
+            }
+        }
+        // Turn all LEDs "on"
+        for i in 0..17 {
+            self.device.smbus_write_byte_data(ENABLE_OFFSET + i, 127);
+        }
+
+        // Initialize frame 0
+        self.device.smbus_write_byte_data(BANK_ADDRESS, 0);
+        // Turn off blinking for all LEDs
+        for i in 0..17 {
+            self.device.smbus_write_byte_data(BLINK_OFFSET + i, 0);
+        }
+        // Set the PWM duty cycle for all LEDs to 0%
+        for i in 0..17 {
+            for j in 0..7 {
+                self.device
+                    .smbus_write_byte_data(COLOR_OFFSET + (i * 8) + j, 0);
+            }
+        }
+        // Turn all LEDs "on"
+        for i in 0..17 {
+            self.device.smbus_write_byte_data(ENABLE_OFFSET + i, 127);
+        }
     }
 
     fn sleep(&mut self, value: bool) -> Result<(), i2cdev::linux::LinuxI2CError> {
