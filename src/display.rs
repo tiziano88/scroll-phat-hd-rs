@@ -139,9 +139,7 @@ impl I2CDisplay {
 #[cfg(target_os = "linux")]
 impl Display for I2CDisplay {
     fn show(&mut self, buffer: &[Column]) {
-        // TODO(tzn): Double buffering.
-        // let new_frame = (self.frame + 1) % 2;
-        let new_frame = 1;
+        let new_frame = (self.frame + 1) % 2;
         self.bank(new_frame);
         for y in 0..DISPLAY_HEIGHT {
             for x in 0..DISPLAY_WIDTH {
