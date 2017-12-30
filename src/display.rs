@@ -37,6 +37,9 @@ const COLOR_OFFSET: u8 = 0x24;
 
 const ADDRESS: u16 = 0x74;
 
+const LED_COLUMNS: usize = 17;
+const LED_ROWS: usize = 7;
+
 /// Represents a device capable of displaying a rectangular bitmap buffer.
 pub trait Display {
     fn show(&mut self, buffer: &[Column]);
@@ -111,29 +114,19 @@ impl I2CDisplay {
         // Disable audio sync.
         self.register(CONFIG_BANK, AUDIOSYNC_REGISTER, 0);
 
-        // Initialize frame 1.
-        self.write_data(BANK_ADDRESS, &[1]);
+        // Initialize frames 0 and 1.
+        for frame in 0..2 {
+            self.write_data(BANK_ADDRESS, &[frame]);
 
-        // Turn off blinking for all LEDs.
-        self.write_data(BLINK_OFFSET, &[0; 17]);
+            // Turn off blinking for all LEDs.
+            self.write_data(BLINK_OFFSET, &[0; LED_COLUMNS]);
 
-        // Set the PWM duty cycle for all LEDs to 0%.
-        self.write_data(COLOR_OFFSET, &[0; 17 * 7]);
+            // Set the PWM duty cycle for all LEDs to 0%.
+            self.write_data(COLOR_OFFSET, &[0; LED_COLUMNS * LED_ROWS]);
 
-        // Turn all LEDs "on".
-        self.write_data(ENABLE_OFFSET, &[127; 17]);
-
-        // Initialize frame 0.
-        self.write_data(BANK_ADDRESS, &[0]);
-
-        // Turn off blinking for all LEDs.
-        self.write_data(BLINK_OFFSET, &[0; 17]);
-
-        // Set the PWM duty cycle for all LEDs to 0%.
-        self.write_data(COLOR_OFFSET, &[0; 17 * 7]);
-
-        // Turn all LEDs "on".
-        self.write_data(ENABLE_OFFSET, &[127; 17]);
+            // Turn all LEDs "on".
+            self.write_data(ENABLE_OFFSET, &[127; LED_COLUMNS]);
+        }
     }
 
     fn sleep(&mut self, value: bool) -> Result<(), i2cdev::linux::LinuxI2CError> {
