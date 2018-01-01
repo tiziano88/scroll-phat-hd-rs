@@ -406,13 +406,13 @@ pub fn font() -> HashMap<char, Glyph> {
                   "x xx ",
                   " xx x"]));
     glyphs.insert('R', make_glyph([
-                  "     ",
-                  "xxx  ",
-                  "x  x ",
-                  "xxx  ",
-                  "x  x ",
-                  "x  x ",
-                  "x  x "]));
+                  "    ",
+                  "xxx ",
+                  "x  x",
+                  "xxx ",
+                  "x  x",
+                  "x  x",
+                  "x  x"]));
     glyphs.insert('S', make_glyph([
                   "    ",
                   " xxx",
