@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -28,6 +28,7 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
@@ -43,7 +44,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -139,101 +140,101 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>display</span>::<span class='kw-2'>*</span>;
-<span class='kw'>use</span> <span class='ident'>font</span>::<span class='kw-2'>*</span>;
-<span class='kw'>use</span> <span class='ident'>shared</span>::<span class='kw-2'>*</span>;
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">display</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">font</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">shared</span>::<span class="kw-2">*</span>;
 
-<span class='doccomment'>/// A virtual scrollable buffer with a scoll offset defining a visible window on the buffer itself.</span>
-<span class='doccomment'>/// It is composed by a horizontally growable virtual buffer, and an offset that defines what</span>
-<span class='doccomment'>/// portion of the buffer is actually visible.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```text</span>
-<span class='doccomment'>/// ┌─────────────────────────virtual buffer─────────────────────┐</span>
-<span class='doccomment'>/// ┌───────────╔═════════════════╗──────────────────────────────┐</span>
-<span class='doccomment'>/// │▓▓▓▓▓▓▓▓▓▓▓║░░░░░░░░░░░░░░░░░║▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│</span>
-<span class='doccomment'>/// │▓▓▓▓▓▓▓▓▓▓▓║░░░░░░░░░░░░░░░░░║▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│</span>
-<span class='doccomment'>/// │▓▓▓▓▓▓▓▓▓▓▓║░░░░░░░░░░░░░░░░░║▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│</span>
-<span class='doccomment'>/// └───────────╚═════════════════╝──────────────────────────────┘</span>
-<span class='doccomment'>/// └──offset───┴─visible buffer──┘</span>
-<span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Scroller</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='ident'>virtual_buffer</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Column</span><span class='op'>&gt;</span>,
-    <span class='ident'>scroll_offset</span>: <span class='ident'>usize</span>,
-    <span class='ident'>display</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>Display</span>,
+<span class="doccomment">/// A virtual scrollable buffer with a scoll offset defining a visible window on the buffer itself.</span>
+<span class="doccomment">/// It is composed by a horizontally growable virtual buffer, and an offset that defines what</span>
+<span class="doccomment">/// portion of the buffer is actually visible.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```text</span>
+<span class="doccomment">/// ┌─────────────────────────virtual buffer─────────────────────┐</span>
+<span class="doccomment">/// ┌───────────╔═════════════════╗──────────────────────────────┐</span>
+<span class="doccomment">/// │▓▓▓▓▓▓▓▓▓▓▓║░░░░░░░░░░░░░░░░░║▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│</span>
+<span class="doccomment">/// │▓▓▓▓▓▓▓▓▓▓▓║░░░░░░░░░░░░░░░░░║▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│</span>
+<span class="doccomment">/// │▓▓▓▓▓▓▓▓▓▓▓║░░░░░░░░░░░░░░░░░║▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│</span>
+<span class="doccomment">/// └───────────╚═════════════════╝──────────────────────────────┘</span>
+<span class="doccomment">/// └──offset───┴─visible buffer──┘</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Scroller</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">virtual_buffer</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span>,
+    <span class="ident">scroll_offset</span>: <span class="ident">usize</span>,
+    <span class="ident">display</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Display</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Scroller</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>/// Create a new `Scroller` using the provided `Display`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>display</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>Display</span>) <span class='op'>-&gt;</span> <span class='ident'>Scroller</span> {
-        <span class='ident'>Scroller</span> {
-            <span class='ident'>virtual_buffer</span>: <span class='macro'>vec</span><span class='macro'>!</span>[],
-            <span class='ident'>scroll_offset</span>: <span class='number'>0</span>,
-            <span class='ident'>display</span>: <span class='ident'>display</span>,
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Scroller</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Create a new `Scroller` using the provided `Display`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">display</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Display</span>) <span class="op">-&gt;</span> <span class="ident">Scroller</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">Scroller</span> {
+            <span class="ident">virtual_buffer</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+            <span class="ident">scroll_offset</span>: <span class="number">0</span>,
+            <span class="ident">display</span>: <span class="ident">display</span>,
         }
     }
 
-    <span class='doccomment'>/// Moves the visible buffer one pixel to the right. When the right side of the visible buffer</span>
-    <span class='doccomment'>/// reaches the right side of the virtual buffer, it starts again from the beginning.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>scroll</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='self'>self</span>.<span class='ident'>scroll_offset</span> <span class='op'>+=</span> <span class='number'>1</span>;
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>scroll_offset</span> <span class='op'>&gt;=</span> <span class='self'>self</span>.<span class='ident'>virtual_buffer</span>.<span class='ident'>len</span>() {
-            <span class='self'>self</span>.<span class='ident'>scroll_offset</span> <span class='op'>=</span> <span class='number'>0</span>;
+    <span class="doccomment">/// Moves the visible buffer one pixel to the right. When the right side of the visible buffer</span>
+    <span class="doccomment">/// reaches the right side of the virtual buffer, it starts again from the beginning.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scroll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">scroll_offset</span> <span class="op">+=</span> <span class="number">1</span>;
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">scroll_offset</span> <span class="op">&gt;=</span> <span class="self">self</span>.<span class="ident">virtual_buffer</span>.<span class="ident">len</span>() {
+            <span class="self">self</span>.<span class="ident">scroll_offset</span> <span class="op">=</span> <span class="number">0</span>;
         }
     }
 
-    <span class='doccomment'>/// Sets the value of an individual pixel in the virtual buffer.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Coordinates are zero-based, with the origin in the top left corner of the virtual buffer,</span>
-    <span class='doccomment'>/// and increasing down and to the right.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If the virtual buffer is not wide enough to contain the pixel, it is automatically extended</span>
-    <span class='doccomment'>/// up to that size.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_pixel</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>x</span>: <span class='ident'>usize</span>, <span class='ident'>y</span>: <span class='ident'>usize</span>, <span class='ident'>value</span>: <span class='ident'>u8</span>) {
-        <span class='kw'>if</span> <span class='ident'>y</span> <span class='op'>&gt;=</span> <span class='ident'>DISPLAY_HEIGHT</span> {
-            <span class='kw'>return</span>;
+    <span class="doccomment">/// Sets the value of an individual pixel in the virtual buffer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Coordinates are zero-based, with the origin in the top left corner of the virtual buffer,</span>
+    <span class="doccomment">/// and increasing down and to the right.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the virtual buffer is not wide enough to contain the pixel, it is automatically extended</span>
+    <span class="doccomment">/// up to that size.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_pixel</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">y</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">u8</span>) {
+        <span class="kw">if</span> <span class="ident">y</span> <span class="op">&gt;=</span> <span class="ident">DISPLAY_HEIGHT</span> {
+            <span class="kw">return</span>;
         }
-        <span class='kw'>if</span> <span class='ident'>x</span> <span class='op'>&gt;=</span> <span class='self'>self</span>.<span class='ident'>virtual_buffer</span>.<span class='ident'>len</span>() {
-            <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>virtual_buffer</span>.<span class='ident'>len</span>()..(<span class='ident'>x</span> <span class='op'>+</span> <span class='number'>1</span>) {
-                <span class='self'>self</span>.<span class='ident'>virtual_buffer</span>.<span class='ident'>push</span>(<span class='ident'>EMPTY_COLUMN</span>);
+        <span class="kw">if</span> <span class="ident">x</span> <span class="op">&gt;=</span> <span class="self">self</span>.<span class="ident">virtual_buffer</span>.<span class="ident">len</span>() {
+            <span class="kw">for</span> _ <span class="kw">in</span> <span class="self">self</span>.<span class="ident">virtual_buffer</span>.<span class="ident">len</span>()..(<span class="ident">x</span> <span class="op">+</span> <span class="number">1</span>) {
+                <span class="self">self</span>.<span class="ident">virtual_buffer</span>.<span class="ident">push</span>(<span class="ident">EMPTY_COLUMN</span>);
             }
         }
-        <span class='self'>self</span>.<span class='ident'>virtual_buffer</span>[<span class='ident'>x</span>][<span class='ident'>y</span>] <span class='op'>=</span> <span class='ident'>value</span>;
+        <span class="self">self</span>.<span class="ident">virtual_buffer</span>[<span class="ident">x</span>][<span class="ident">y</span>] <span class="op">=</span> <span class="ident">value</span>;
     }
 
-    <span class='doccomment'>/// Clears the virtual buffer and sets the text to the specified value.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_text</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>text</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
-        <span class='self'>self</span>.<span class='ident'>clear</span>();
-        <span class='kw'>let</span> <span class='ident'>font</span> <span class='op'>=</span> <span class='ident'>font</span>();
-        <span class='kw'>for</span> <span class='ident'>c</span> <span class='kw'>in</span> <span class='ident'>text</span>.<span class='ident'>chars</span>() {
-            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>glyph</span>) <span class='op'>=</span> <span class='ident'>font</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>c</span>) {
-                <span class='kw'>for</span> <span class='ident'>c</span> <span class='kw'>in</span> <span class='ident'>glyph</span> {
-                    <span class='self'>self</span>.<span class='ident'>virtual_buffer</span>.<span class='ident'>push</span>(<span class='kw-2'>*</span><span class='ident'>c</span>);
+    <span class="doccomment">/// Clears the virtual buffer and sets the text to the specified value.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_text</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+        <span class="self">self</span>.<span class="ident">clear</span>();
+        <span class="kw">let</span> <span class="ident">font</span> <span class="op">=</span> <span class="ident">font</span>();
+        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">text</span>.<span class="ident">chars</span>() {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">glyph</span>) <span class="op">=</span> <span class="ident">font</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) {
+                <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">glyph</span> {
+                    <span class="self">self</span>.<span class="ident">virtual_buffer</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">c</span>);
                 }
-                <span class='self'>self</span>.<span class='ident'>virtual_buffer</span>.<span class='ident'>push</span>(<span class='ident'>EMPTY_COLUMN</span>);
+                <span class="self">self</span>.<span class="ident">virtual_buffer</span>.<span class="ident">push</span>(<span class="ident">EMPTY_COLUMN</span>);
             }
         }
     }
 
-    <span class='doccomment'>/// Returns the visible buffer taking into account the current scroll offset.</span>
-    <span class='kw'>fn</span> <span class='ident'>visible_buffer</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Column</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>virtual_buffer</span>
-            .<span class='ident'>iter</span>()
-            .<span class='ident'>skip</span>(<span class='self'>self</span>.<span class='ident'>scroll_offset</span>)
-            .<span class='ident'>take</span>(<span class='ident'>DISPLAY_WIDTH</span>)
-            .<span class='ident'>cloned</span>()
-            .<span class='ident'>collect</span>()
+    <span class="doccomment">/// Returns the visible buffer taking into account the current scroll offset.</span>
+    <span class="kw">fn</span> <span class="ident">visible_buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">virtual_buffer</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">skip</span>(<span class="self">self</span>.<span class="ident">scroll_offset</span>)
+            .<span class="ident">take</span>(<span class="ident">DISPLAY_WIDTH</span>)
+            .<span class="ident">cloned</span>()
+            .<span class="ident">collect</span>()
     }
 
-    <span class='doccomment'>/// Sends the visible buffer to the output display.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>show</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>let</span> <span class='ident'>visible_buffer</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>visible_buffer</span>();
-        <span class='self'>self</span>.<span class='ident'>display</span>.<span class='ident'>show</span>(<span class='kw-2'>&amp;</span><span class='ident'>visible_buffer</span>);
+    <span class="doccomment">/// Sends the visible buffer to the output display.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">show</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="ident">visible_buffer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">visible_buffer</span>();
+        <span class="self">self</span>.<span class="ident">display</span>.<span class="ident">show</span>(<span class="kw-2">&amp;</span><span class="ident">visible_buffer</span>).<span class="ident">unwrap</span>();
     }
 
-    <span class='doccomment'>/// Clears the virtual buffer.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>clear</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='self'>self</span>.<span class='ident'>virtual_buffer</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[];
+    <span class="doccomment">/// Clears the virtual buffer.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">virtual_buffer</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
     }
 }
 </pre>
@@ -254,13 +255,15 @@
                     <dd>Show this help dialog</dd>
                     <dt>S</dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt>↑</dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt>↓</dt>
                     <dd>Move down in search results</dd>
+                    <dt>↹</dt>
+                    <dd>Switch tab</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
+                    <dt style="width:31px;">+ / -</dt>
                     <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
@@ -294,7 +297,6 @@
         window.rootPath = "../../";
         window.currentCrate = "scroll_phat_hd";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>
