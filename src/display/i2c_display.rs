@@ -68,12 +68,11 @@ impl I2CDisplay {
     }
 
     fn write_data(&mut self, base_address: u8, data: &[u8]) -> Result<(), LinuxI2CError> {
-        let mut offset = 0;
-        for chunk in data.chunks(32) {
-            self.device.smbus_process_block(base_address + offset, chunk)?;
-            offset += 32;
+        const CHUNK_SIZE: usize = 32;
+        for (i, chunk) in data.chunks(CHUNK_SIZE).enumerate() {
+            self.device
+                .smbus_process_block(base_address + (i * CHUNK_SIZE) as u8, chunk)?;
         }
-
         Ok(())
     }
 
