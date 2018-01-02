@@ -1,9 +1,11 @@
 #![allow(dead_code)]
 
+extern crate failure;
 #[cfg(target_os = "linux")]
 extern crate i2cdev;
 extern crate termion;
 
+use self::failure::Error;
 #[cfg(target_os = "linux")]
 use self::i2cdev::core::I2CDevice;
 #[cfg(target_os = "linux")]
@@ -42,7 +44,7 @@ const LED_ROWS: usize = 7;
 
 /// Represents a device capable of displaying a rectangular bitmap buffer.
 pub trait Display {
-    fn show(&mut self, buffer: &[Column]) -> Result<(), LinuxI2CError>;
+    fn show(&mut self, buffer: &[Column]) -> Result<(), Error>;
 }
 
 #[cfg(target_os = "linux")]
@@ -132,7 +134,7 @@ impl I2CDisplay {
 
 #[cfg(target_os = "linux")]
 impl Display for I2CDisplay {
-    fn show(&mut self, buffer: &[Column]) -> Result<(), LinuxI2CError> {
+    fn show(&mut self, buffer: &[Column]) -> Result<(), Error> {
         // Double buffering with frames 0 and 1.
         let new_frame = (self.frame + 1) % 2;
         self.bank(new_frame)?;
@@ -168,7 +170,7 @@ impl TermDisplay {
 }
 
 impl Display for TermDisplay {
-    fn show(&mut self, buffer: &[Column]) -> Result<(), LinuxI2CError> {
+    fn show(&mut self, buffer: &[Column]) -> Result<(), Error> {
         print!("{}", termion::clear::All);
         for x in 0..buffer.len() {
             let col = &buffer[x];
@@ -194,7 +196,7 @@ impl UnicodeDisplay {
 }
 
 impl Display for UnicodeDisplay {
-    fn show(&mut self, buffer: &[Column]) -> Result<(), LinuxI2CError> {
+    fn show(&mut self, buffer: &[Column]) -> Result<(), Error> {
         print!("{}", termion::clear::All);
 
         let col = &buffer[0];
