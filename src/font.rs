@@ -45,6 +45,14 @@ pub fn font() -> HashMap<char, Glyph> {
                   "x",
                   " ",
                   "x"]));
+    glyphs.insert('?', make_glyph([
+                  "    ",
+                  " xx ",
+                  "x  x",
+                  "   x",
+                  "  x ",
+                  "    ",
+                  "  x "]));
     glyphs.insert(',', make_glyph([
                   " ",
                   " ",

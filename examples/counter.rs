@@ -7,7 +7,7 @@ fn main() {
     println!("start");
 
     // let mut display = I2CDisplay::new(1);
-    //let mut display = TermDisplay::new();
+    // let mut display = TermDisplay::new();
     let mut display = UnicodeDisplay::new();
     let mut scroller = Scroller::new(&mut display);
 
