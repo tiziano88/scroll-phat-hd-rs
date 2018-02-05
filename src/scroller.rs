@@ -112,6 +112,6 @@ impl<'a> Scroller<'a> {
 
     /// Clears the virtual buffer.
     pub fn clear(&mut self) {
-        self.virtual_buffer = vec![];
+        self.virtual_buffer.clear();
     }
 }
