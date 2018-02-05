@@ -14,7 +14,7 @@ fn main() {
     scroller.set_text("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz 0123456789+=-_,.:;!?;'\"\\/°#()[]@");
     for _ in 0..3000 {
         scroller.show();
-        std::thread::sleep(std::time::Duration::from_millis(100));
+        std::thread::sleep(std::time::Duration::from_millis(50));
         scroller.scroll();
     }
 
