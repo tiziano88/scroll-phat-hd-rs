@@ -3,7 +3,7 @@ extern crate rusttype;
 use display::*;
 use shared::*;
 
-/// A virtual scrollable buffer with a scoll offset defining a visible window on the buffer itself.
+/// A virtual scrollable buffer with a scroll offset defining a visible window on the buffer itself.
 /// It is composed by a horizontally growable virtual buffer, and an offset that defines what
 /// portion of the buffer is actually visible.
 ///
