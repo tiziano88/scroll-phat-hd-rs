@@ -9,7 +9,6 @@
 //! scroller.show();
 //! ```
 
-mod font;
 mod shared;
 
 pub mod display;

@@ -15,8 +15,9 @@ Scroll Phat HD library.
 travis-ci = { repository = "tiziano88/scroll-phat-hd-rs" }
 
 [dependencies]
-termion = "1.0"
 failure = "0.1"
+termion = "1.0"
+rusttype = "0.2"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 i2cdev = "0.3"

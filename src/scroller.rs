@@ -1,5 +1,6 @@
+extern crate rusttype;
+
 use display::*;
-use font::*;
 use shared::*;
 
 /// A virtual scrollable buffer with a scoll offset defining a visible window on the buffer itself.
@@ -19,15 +20,31 @@ pub struct Scroller<'a> {
     virtual_buffer: Vec<Column>,
     scroll_offset: usize,
     display: &'a mut Display,
+    font: rusttype::Font<'a>,
+    font_scale: f32,
 }
 
 impl<'a> Scroller<'a> {
     /// Create a new `Scroller` using the provided `Display`.
     pub fn new(display: &'a mut Display) -> Scroller<'a> {
+        // Scale values for other fonts found on https://www.dafont.com/:
+        // Minecraftia-Regular: 11.0
+        // 8-bit pusab: 10.0
+        // Pixeled: 14.0
+        // Commodore Pixelized v1.2: 10.0
+        // 000webfont: ???
+        // aerxtabs_memesbruh03: ???
+        // slkscr: ???
+        // visitor1: ???
+        let font_data = include_bytes!("./../fonts/Commodore Pixelized v1.2.ttf");
+        let collection = rusttype::FontCollection::from_bytes(font_data as &[u8]);
+        let font = collection.into_font().unwrap();
         Scroller {
             virtual_buffer: vec![],
             scroll_offset: 0,
             display: display,
+            font: font,
+            font_scale: 10.0,
         }
     }
 
@@ -62,14 +79,18 @@ impl<'a> Scroller<'a> {
     /// Clears the virtual buffer and sets the text to the specified value.
     pub fn set_text(&mut self, text: &str) {
         self.clear();
-        let font = font();
-        for c in text.chars() {
-            if let Some(glyph) = font.get(&c) {
-                for c in glyph {
-                    self.virtual_buffer.push(*c);
-                }
-                self.virtual_buffer.push(EMPTY_COLUMN);
-            }
+        let mut start = 0usize;
+        for g in self.font.clone().glyphs_for(text.chars()) {
+            let scaled_glyph = g.scaled(rusttype::Scale::uniform(self.font_scale));
+            let width = scaled_glyph.h_metrics().advance_width as usize;
+            let positioned_glyph = scaled_glyph.positioned(rusttype::point(0.0, 0.0));
+            positioned_glyph.draw(|x, y, v| {
+                let x = x as usize;
+                let y = y as usize;
+                let v = (v * 255.0) as u8;
+                self.set_pixel(start + x, y, v);
+            });
+            start += width;
         }
     }
 
