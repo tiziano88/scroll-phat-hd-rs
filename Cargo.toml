@@ -16,7 +16,7 @@ travis-ci = { repository = "tiziano88/scroll-phat-hd-rs" }
 
 [dependencies]
 failure = "0.1"
-termion = "1.0"
+termion = "1.5"
 rusttype = "0.2"
 
 [target.'cfg(target_os = "linux")'.dependencies]
